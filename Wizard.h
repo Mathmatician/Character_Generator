@@ -6,6 +6,6 @@ private:
 	static const std::map<ABILITIES, int> WIZARD_ABILITY_LEVELS;
 
 public:
-	static int ABILITY_LEVEL(ABILITIES ability);
+	virtual int ABILITY_LEVEL(ABILITIES ability);
 	Wizard();
 };

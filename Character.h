@@ -4,6 +4,7 @@
 
 #include "definitions.h"
 #include "Ability_Definitions.h"
+#include "Custom_Random.h"
 
 class Character {
 private:
@@ -22,7 +23,8 @@ private:
 	int temporary_hitpoints;
 	std::string hitDice; // maybe this is more complicated?
 
-	std::map<std::string, int> inventory;
+	std::map<int, int> inventory;
+	float copper;
 	std::vector<ABILITIES> ability_list;
 	std::vector<FEATS> feat_list;
 
@@ -31,9 +33,12 @@ private:
 		int failures = 0;
 	} deathSaves;
 
-
-	int skills[NUM_OF_SKILLS];
-	int attributes[NUM_OF_ATTRIBUTES];
+	struct SKILLS {
+		int trained = 0;
+		int value = 0;
+	} skills[NUM_OF_SKILLS];
+	
+	int ability_scores[NUM_OF_ABILITY_SCORES];
 
 	static const std::map<FEATS, int> FEAT_LEVEL_REQUIREMENTS;
 
@@ -55,10 +60,16 @@ public:
 	void SetMaxHitpoints(int hp);
 	void SetCurrentHitpoints(int hp);
 	void SetTemporaryHitpoints(int hp);
-	void AddToInventory(std::string itm);
-	void RemoveFromInventory(std::string itm);
-	void SetAttribute(int attr_id, int value);
-	void SetSkill(int skill_id, int value);
+	void AddToInventory(int itm, int quantity);
+	void RemoveFromInventory(int, int quantity);
+	void SetMoneyAmount(int mny);
+	void AddMoney(int mny);
+	void SubtractMoney(int mny);
+	void SetAbilityScore(int attr_id, int value);
+	void AddToAbilityScore(int attr_id, int value);
+	void SetSkill(int skill_id, int value, int trained);
+	void SetSkillValue(int skill_id, int value);
+	void MarkSkillTrained(int skill_id, int trained);
 	bool AddAbility(ABILITIES ability_id);
 	bool RemoveAbility(ABILITIES ability_id);
 	bool HasAbility(ABILITIES ability_id);
@@ -67,12 +78,14 @@ public:
 	bool HasFeat(FEATS ability_id);
 	void SetDeathSaves(int death_save_id);
 	void ResetDeathSaves();
+	void SetAllSkillsByAbilityModifiers();
 
 	const std::string getCharacterName();
 	const int getLevel();
-	const std::string getBackground();
+	const int getBackground();
 	const std::string getPlayerName();
-	const std::string getRace();
+	const int getRaceId();
+	const int getClassId();
 	const std::string getAlignment();
 	const int getExperiencePoints();
 	const int getArmorClass();
@@ -81,10 +94,20 @@ public:
 	const int getMaxHitpoints();
 	const int getCurrentHitpoints();
 	const int getTemporaryHitpoints();
-	const std::map<std::string, int>& getInventory();
-	const int getAttributeValue(int attr_id);
-	const int getAttributeModifier(int attr_id);
+	const std::map<int, int>& getInventory();
+	const int getAbilityScore(int attr_id);
+	const int getAbilityModifier(int attr_id);
+	const int getProficiencyBonus();
 	const int getSkillValue(int skill_id);
+	const int getMoneyInCoper();
+	const int getMoneyInSilver();
+	const int getMoneyInElectrum();
+	const int getMoneyInGold();
+	const int getMoneyInPlatinum();
+	const bool isTrainedInSkill(int skill_id);
+
+	virtual int ABILITY_LEVEL(ABILITIES ability) = 0;
 
 	static int FEAT_LEVELS(FEATS feat_id);
+	static void SelectEquipmentPack(Character* character, int equipment_pack_id);
 };

@@ -11,3 +11,8 @@ int Artificer::ABILITY_LEVEL(ABILITIES ability)
 {
 	return ARTIFICER_ABILITY_LEVELS.at(ability);
 }
+
+void Artificer::EquipmentSelection(Character* character)
+{
+
+}

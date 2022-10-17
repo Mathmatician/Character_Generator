@@ -6,6 +6,7 @@ private:
 	static const std::map<ABILITIES, int> BARD_ABILITY_LEVELS;
 
 public:
-	static int ABILITY_LEVEL(ABILITIES ability);
 	Bard();
+	virtual int ABILITY_LEVEL(ABILITIES ability);
+	static void EquipmentSelection(Character* character);
 };

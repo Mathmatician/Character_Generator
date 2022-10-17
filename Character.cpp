@@ -1,4 +1,5 @@
 #include "Character.h"
+#include "Equipment_Pack_Functions.h"
 
 void Character::SetCharacterName(std::string nm)
 {
@@ -76,50 +77,92 @@ void Character::SetTemporaryHitpoints(int hp)
 	temporary_hitpoints = hp;
 }
 
-void Character::AddToInventory(std::string itm)
+void Character::AddToInventory(int itm, int quantity)
 {
 	if (inventory.find(itm) == inventory.end())
 	{
-		inventory[itm] = 1;
+		inventory[itm] = quantity;
 	}
 	else
 	{
 		if (inventory[itm] <= 0)
 			inventory[itm] = 1;
 
-		inventory[itm]++;
+		inventory[itm] += quantity;
 	}
 }
 
-void Character::RemoveFromInventory(std::string itm)
+void Character::RemoveFromInventory(int itm, int quantity)
 {
 	if (inventory.find(itm) != inventory.end())
 	{
-		inventory[itm]--;
+		inventory[itm] -= quantity;
 
 		if (inventory[itm] <= 0)
 			inventory.erase(itm);
 	}
 }
 
-void Character::SetAttribute(int attr_id, int value)
+void Character::SetMoneyAmount(int mny)
 {
-	attributes[attr_id] = value;
+	copper = mny;
 }
 
-void Character::SetSkill(int skill_id, int value)
+void Character::AddMoney(int mny)
 {
-	skills[skill_id] = value;
+	copper += mny;
+}
+
+void Character::SubtractMoney(int mny)
+{
+	copper -= mny;
+}
+
+void Character::SetAbilityScore(int attr_id, int value)
+{
+	ability_scores[attr_id] = value;
+}
+
+void Character::AddToAbilityScore(int attr_id, int value)
+{
+	ability_scores[attr_id] += value;
+}
+
+void Character::SetSkill(int skill_id, int value, int trained)
+{
+	skills[skill_id].value = value;
+	skills[skill_id].trained = trained;
+}
+
+void Character::SetSkillValue(int skill_id, int value)
+{
+	skills[skill_id].value = value;
+}
+
+void Character::MarkSkillTrained(int skill_id, int trained)
+{
+	skills[skill_id].trained = trained;
 }
 
 bool Character::AddAbility(ABILITIES ability_id)
 {
 	if ((int)ability_id < (int)ABILITIES::NUM_OF_ABILITIES && (int)ability_id > -1)
 	{
-		int lvl_req = abilities_map->at(ability_id);
+		int lvl_req = -1;
 
-		if (level >= lvl_req)
+		if (abilities_map->find(ability_id) != abilities_map->end())
 		{
+			lvl_req = abilities_map->at(ability_id);
+		}
+
+		if (level >= lvl_req && lvl_req != -1)
+		{
+			for (auto& ab_id : ability_list)
+			{
+				if (ab_id == ability_id)
+					return false;
+			}
+
 			ability_list.push_back(ability_id);
 			return true;
 		}
@@ -161,6 +204,12 @@ bool Character::AddFeat(FEATS feat_id)
 
 		if (level >= lvl_req)
 		{
+			for (auto& ft_id : feat_list)
+			{
+				if (ft_id == feat_id)
+					return false;
+			}
+
 			feat_list.push_back(feat_id);
 			return true;
 		}
@@ -213,6 +262,21 @@ void Character::ResetDeathSaves()
 	deathSaves.failures = 0;
 }
 
+void Character::SetAllSkillsByAbilityModifiers()
+{
+	for (int i = 0; i < NUM_OF_SKILLS; i++)
+	{
+		int skill_type = GetSKillType(i);
+		int ability_modifier = getAbilityModifier(skill_type);
+		skills[i].value = ability_modifier;
+
+		if (skills[i].trained == 1)
+		{
+			skills[i].value += getProficiencyBonus();
+		}
+	}
+}
+
 const std::string Character::getCharacterName()
 {
 	return character_name;
@@ -223,9 +287,9 @@ const int Character::getLevel()
 	return level;
 }
 
-const std::string Character::getBackground()
+const int Character::getBackground()
 {
-	return GetBackgroundText(background);
+	return background;
 }
 
 const std::string Character::getPlayerName()
@@ -233,9 +297,14 @@ const std::string Character::getPlayerName()
 	return player_name;
 }
 
-const std::string Character::getRace()
+const int Character::getRaceId()
 {
-	return GetRaceText(race);
+	return race;
+}
+
+const int Character::getClassId()
+{
+	return class_ID;
 }
 
 const std::string Character::getAlignment()
@@ -278,27 +347,90 @@ const int Character::getTemporaryHitpoints()
 	return temporary_hitpoints;
 }
 
-const std::map<std::string, int>& Character::getInventory()
+const std::map<int, int>& Character::getInventory()
 {
 	return inventory;
 }
 
-const int Character::getAttributeValue(int attr_id)
+const int Character::getAbilityScore(int attr_id)
 {
-	return attributes[attr_id];
+	return ability_scores[attr_id];
 }
 
-const int Character::getAttributeModifier(int attr_id)
+const int Character::getAbilityModifier(int attr_id)
 {
-	return (attributes[attr_id] - 10) / 2;
+	return (ability_scores[attr_id] - 10) / 2;
+}
+
+const int Character::getProficiencyBonus()
+{
+	return (2 + ((level - 1) / 4));
 }
 
 const int Character::getSkillValue(int skill_id)
 {
-	return skills[skill_id];
+	return skills[skill_id].value;
+}
+
+const int Character::getMoneyInCoper()
+{
+	return copper;
+}
+
+const int Character::getMoneyInSilver()
+{
+	return copper / SILVER;
+}
+
+const int Character::getMoneyInElectrum()
+{
+	return copper / ELECTRUM;
+}
+
+const int Character::getMoneyInGold()
+{
+	return copper / GOLD;
+}
+
+const int Character::getMoneyInPlatinum()
+{
+	return copper / PLATINUM;
+}
+
+const bool Character::isTrainedInSkill(int skill_id)
+{
+	return skills[skill_id].trained == 1;
 }
 
 int Character::FEAT_LEVELS(FEATS feat_id)
 {
 	return FEAT_LEVEL_REQUIREMENTS.at(feat_id);
+}
+
+void Character::SelectEquipmentPack(Character* character, int equipment_pack_id)
+{
+	switch (equipment_pack_id)
+	{
+	case BURGLERS_PACK:
+		BurglersPack(character);
+		break;
+	case DIPLOMATS_PACK:
+		DiplomatsPack(character);
+		break;
+	case DUNGEONEERS_PACK:
+		DungeoneersPack(character);
+		break;
+	case ENTERTAINERS_PACK:
+		EntertainersPack(character);
+		break;
+	case EXPLORERS_PACK:
+		ExploerersPack(character);
+		break;
+	case PRIESTS_PACK:
+		PriestsPack(character);
+		break;
+	case SCHOLARS_PACK:
+		ScholarsPack(character);
+		break;
+	}
 }
