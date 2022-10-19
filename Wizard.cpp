@@ -10,3 +10,7 @@ int Wizard::ABILITY_LEVEL(ABILITIES ability)
 {
 	return WIZARD_ABILITY_LEVELS.at(ability);
 }
+
+const std::map<ABILITIES, int> Wizard::WIZARD_ABILITY_LEVELS = {
+	{ABILITIES::SECOND_WIND, 3}
+};

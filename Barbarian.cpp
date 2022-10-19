@@ -117,3 +117,7 @@ void EquipmentSelection(Character* character)
 	Character::SelectEquipmentPack(character, EXPLORERS_PACK);
 	character->AddToInventory(JAVELIN, 4);
 }
+
+const std::map<ABILITIES, int> Barbarian::BARBARIAN_ABILITY_LEVELS = {
+	{ABILITIES::SECOND_WIND, 3}
+};

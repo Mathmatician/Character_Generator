@@ -10,3 +10,7 @@ int Monk::ABILITY_LEVEL(ABILITIES ability)
 {
 	return MONK_ABILITY_LEVELS.at(ability);
 }
+
+const std::map<ABILITIES, int> Monk::MONK_ABILITY_LEVELS = {
+	{ABILITIES::SECOND_WIND, 3}
+};

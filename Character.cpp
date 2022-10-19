@@ -434,3 +434,7 @@ void Character::SelectEquipmentPack(Character* character, int equipment_pack_id)
 		break;
 	}
 }
+
+const std::map<FEATS, int> Character::FEAT_LEVEL_REQUIREMENTS = {
+	{FEATS::LINGUIST, 1}
+};

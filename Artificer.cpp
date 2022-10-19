@@ -16,3 +16,8 @@ void Artificer::EquipmentSelection(Character* character)
 {
 
 }
+
+
+const std::map<ABILITIES, int> Artificer::ARTIFICER_ABILITY_LEVELS = {
+	{ABILITIES::SECOND_WIND, 3}
+};

@@ -114,3 +114,7 @@ void Bard::EquipmentSelection(Character* character)
 	character->AddToInventory(LEATHER_ARMOR, 1);
 	character->AddToInventory(DAGGER, 1);
 }
+
+const std::map<ABILITIES, int> Bard::BARD_ABILITY_LEVELS = {
+	{ABILITIES::SECOND_WIND, 3}
+};

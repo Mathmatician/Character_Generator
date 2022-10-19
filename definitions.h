@@ -48,6 +48,7 @@ static enum {
 	HALFLING,
 	DRAGONBORN,
 	ELF,
+	DWARF,
 	NUM_OF_RACES
 };
 

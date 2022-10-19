@@ -58,3 +58,7 @@ void Rogue::EquipmentSelection(Character* character)
 	character->AddToInventory(DAGGER, 2);
 	character->AddToInventory(THIEVES_TOOLS, 1);
 }
+
+const std::map<ABILITIES, int> Rogue::ROGUE_ABILITY_LEVELS = {
+	{ABILITIES::SECOND_WIND, 3}
+};

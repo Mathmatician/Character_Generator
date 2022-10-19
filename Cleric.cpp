@@ -14,14 +14,23 @@ int Cleric::ABILITY_LEVEL(ABILITIES ability)
 void Cleric::EquipmentSelection(Character* character)
 {
 	int selection = GenerateRandomNumber(0, 1);
-	switch (selection)
+	bool item_selected = false;
+	while (!item_selected)
 	{
-	case 0:
-		character->AddToInventory(MACE, 1);
-		break;
-	case 1:
-		character->AddToInventory(WARHAMMER, 1);
-		break;
+		switch (selection)
+		{
+		case 0:
+			character->AddToInventory(MACE, 1);
+			item_selected = true;
+			break;
+		case 1:
+			if (character->getRaceId() == DWARF)
+			{
+				character->AddToInventory(WARHAMMER, 1);
+				item_selected = true;
+			}
+			break;
+		}
 	}
 
 	selection = GenerateRandomNumber(0, 2);
@@ -53,3 +62,7 @@ void Cleric::EquipmentSelection(Character* character)
 		break;
 	}
 }
+
+const std::map<ABILITIES, int> Cleric::CLERIC_ABILITY_LEVELS = {
+	{ABILITIES::SECOND_WIND, 3}
+};
