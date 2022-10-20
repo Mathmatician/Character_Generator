@@ -39,10 +39,18 @@ void CharacterCreationProcess(int class_id, int race_id, int background_id, int 
 	// Step 12: Add ability points by level
 	AddAbilityPointsByLevel(character);
 
-	// Step 13: Add ability modifiers to all skills by governing ability (skill type). Proficiency is accounted when this function is called
-	character->SetAllSkillsByAbilityModifiers();
+	// Step 13: Set Hitpoints
+	SetHitPoints(character);
 
-	// Step 14: Add Equipment by background
+	// Step 14: Set armor class
+
+	// Step 15: Set speed
+	SetCharacterSpeed(character);
+
+	// Step 16: Set initiative
+	character->SetInitiative(character->getAbilityModifier(DEXTERITY));
+
+	// Step 17: Add Equipment by background
 
 	DisplayCharacterStats(character);
 
@@ -97,19 +105,37 @@ Character* SelectClass(int class_id)
 	return nullptr;
 }
 
-int RollD6()
+int RollDice(int dice)
 {
-	return GenerateRandomNumber(1, 6);
-}
-
-int RollD4()
-{
-	return GenerateRandomNumber(1, 4);
+	switch(dice)
+	{
+	case D4:
+		return GenerateRandomNumber(1, 4);
+		break;
+	case D6:
+		return GenerateRandomNumber(1, 6);
+		break;
+	case D8:
+		return GenerateRandomNumber(1, 8);
+		break;
+	case D10:
+		return GenerateRandomNumber(0, 9);
+		break;
+	case DP10:
+		return 10 * GenerateRandomNumber(0, 9);
+		break;
+	case D12:
+		return GenerateRandomNumber(1, 12);
+		break;
+	case D20:
+		return GenerateRandomNumber(1, 20);
+		break;
+	}
 }
 
 int RollFourD6DropOne()
 {
-	int dice[4] = { RollD6(), RollD6(), RollD6(), RollD6() };
+	int dice[4] = { RollDice(D6), RollDice(D6), RollDice(D6), RollDice(D6) };
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -158,40 +184,40 @@ void RollForGold(Character* character)
 	case ARTIFICER:
 		break;
 	case BARBARIAN:
-		character->SetMoneyAmount(10 * GOLD * (RollD4() + RollD4()));
+		character->SetMoneyAmount(10 * GOLD * (RollDice(D4) + RollDice(D4)));
 		break;
 	case BARD:
-		character->SetMoneyAmount(10 * GOLD * (RollD4() + RollD4() + RollD4() + RollD4() + RollD4()));
+		character->SetMoneyAmount(10 * GOLD * (RollDice(D4) + RollDice(D4) + RollDice(D4) + RollDice(D4) + RollDice(D4)));
 		break;
 	case CLERIC:
-		character->SetMoneyAmount(10 * GOLD * (RollD4() + RollD4() + RollD4() + RollD4() + RollD4()));
+		character->SetMoneyAmount(10 * GOLD * (RollDice(D4) + RollDice(D4) + RollDice(D4) + RollDice(D4) + RollDice(D4)));
 		break;
 	case DRUID:
-		character->SetMoneyAmount(10 * GOLD * (RollD4() + RollD4()));
+		character->SetMoneyAmount(10 * GOLD * (RollDice(D4) + RollDice(D4)));
 		break;
 	case FIGHTER:
-		character->SetMoneyAmount(10 * GOLD * (RollD4() + RollD4() + RollD4() + RollD4() + RollD4()));
+		character->SetMoneyAmount(10 * GOLD * (RollDice(D4) + RollDice(D4) + RollDice(D4) + RollDice(D4) + RollDice(D4)));
 		break;
 	case MONK:
-		character->SetMoneyAmount(GOLD * (RollD4() + RollD4() + RollD4() + RollD4() + RollD4()));
+		character->SetMoneyAmount(GOLD * (RollDice(D4) + RollDice(D4) + RollDice(D4) + RollDice(D4) + RollDice(D4)));
 		break;
 	case PALADIN:
-		character->SetMoneyAmount(10 * GOLD * (RollD4() + RollD4() + RollD4() + RollD4() + RollD4()));
+		character->SetMoneyAmount(10 * GOLD * (RollDice(D4) + RollDice(D4) + RollDice(D4) + RollDice(D4) + RollDice(D4)));
 		break;
 	case RANGER:
-		character->SetMoneyAmount(10 * GOLD * (RollD4() + RollD4() + RollD4() + RollD4() + RollD4()));
+		character->SetMoneyAmount(10 * GOLD * (RollDice(D4) + RollDice(D4) + RollDice(D4) + RollDice(D4) + RollDice(D4)));
 		break;
 	case ROGUE:
-		character->SetMoneyAmount(10 * GOLD * (RollD4() + RollD4() + RollD4() + RollD4()));
+		character->SetMoneyAmount(10 * GOLD * (RollDice(D4) + RollDice(D4) + RollDice(D4) + RollDice(D4)));
 		break;
 	case SORCERER:
-		character->SetMoneyAmount(10 * GOLD * (RollD4() + RollD4() + RollD4()));
+		character->SetMoneyAmount(10 * GOLD * (RollDice(D4) + RollDice(D4) + RollDice(D4)));
 		break;
 	case WARLOCK:
-		character->SetMoneyAmount(10 * GOLD * (RollD4() + RollD4() + RollD4() + RollD4()));
+		character->SetMoneyAmount(10 * GOLD * (RollDice(D4) + RollDice(D4) + RollDice(D4) + RollDice(D4)));
 		break;
 	case WIZARD:
-		character->SetMoneyAmount(10 * GOLD * (RollD4() + RollD4() + RollD4() + RollD4()));
+		character->SetMoneyAmount(10 * GOLD * (RollDice(D4) + RollDice(D4) + RollDice(D4) + RollDice(D4)));
 		break;
 	}
 }
@@ -202,6 +228,10 @@ void AddAbilityPointsByLevel(Character* character)
 
 	if (character->getLevel() == 19)
 		ability_points++;
+
+	int feats_to_add = GenerateRandomNumber(0, ability_points);
+
+	ability_points -= feats_to_add;
 
 	while (ability_points > 0)
 	{
@@ -255,24 +285,93 @@ void AddAbilityPointsByLevel(Character* character)
 			ability_points--;
 		}
 	}
+
+	for (int i = 0; i < feats_to_add; i++)
+	{
+		AddFeat(character);
+	}
+}
+
+void AddFeat(Character* character)
+{
+	int feat_selection = GenerateRandomNumber(0, ((int)FEATS::NUM_OF_FEATS) - 1);
+	int count = 0;
+
+	while (character->HasFeat((FEATS)feat_selection))
+	{
+		feat_selection = GenerateRandomNumber(0, ((int)FEATS::NUM_OF_FEATS) - 1);
+		count++;
+
+		if (count >= 10000)
+			break;
+	}
+
+	if (!character->HasFeat((FEATS)feat_selection))
+		character->AddFeat((FEATS)feat_selection);
 }
 
 void AddAbilityPointsByRace(Character* character)
 {
 	switch (character->getRaceId())
 	{
-	case HUMAN:
+	case HILL_DWARF:
+		character->AddToAbilityScore(CONSTITUTION, 2);
+		character->AddToAbilityScore(WISDOM, 1);
 		break;
-	case ORC:
+	case MOUNTAIN_DWARF:
+		character->AddToAbilityScore(CONSTITUTION, 2);
 		character->AddToAbilityScore(STRENGTH, 2);
+		break;
+	case ELF:
+		character->AddToAbilityScore(INTELLIGENCE, 2);
 		break;
 	case HALFLING:
 		character->AddToAbilityScore(DEXTERITY, 2);
 		break;
+	case HUMAN:
+		break;
 	case DRAGONBORN:
 		break;
+	case GNOME:
+		break;
+	case HALF_ELF:
+		break;
+	case HALF_ORC:
+		character->AddToAbilityScore(STRENGTH, 2);
+		break;
+	case TIEFLING:
+		break;
+	}
+}
+
+void SetCharacterSpeed(Character* character)
+{
+	switch (character->getRaceId())
+	{
+	case HILL_DWARF:
+		character->SetSpeed(25);
+		break;
+	case MOUNTAIN_DWARF:
+		character->SetSpeed(25);
+		break;
 	case ELF:
-		character->AddToAbilityScore(INTELLIGENCE, 2);
+		character->SetSpeed(30);
+		break;
+	case HALFLING:
+		character->SetSpeed(25);
+		break;
+	case HUMAN:
+		break;
+	case DRAGONBORN:
+		break;
+	case GNOME:
+		break;
+	case HALF_ELF:
+		break;
+	case HALF_ORC:
+		character->SetSpeed(30);
+		break;
+	case TIEFLING:
 		break;
 	}
 }
@@ -316,8 +415,8 @@ void SelectTrainedSkillsByBackground(Character* character)
 	switch (character->getBackground())
 	{
 	case HIGHLANDER:
-		character->MarkSkillTrained(ATHLETICS, 1);
-		character->MarkSkillTrained(NATURE, 1);
+		character->MarkSkillTrained(ATHLETICS);
+		character->MarkSkillTrained(NATURE);
 		break;
 	}
 }
@@ -395,6 +494,90 @@ int SelectRandomAbilityScoreWithWeight(ABILITY_SCORE_PREFERENCE* absp)
 	return CHARISMA;
 }
 
+void SetHitPoints(Character* character)
+{
+	int hp = 0;
+
+	switch (character->getClassId())
+	{
+	case ARTIFICER:
+		break;
+	case BARBARIAN:
+		character->SetHitDice(D12, 1);
+		hp = 12;
+		break;
+	case BARD:
+		character->SetHitDice(D8, 1);
+		hp = 8;
+		break;
+	case CLERIC:
+		character->SetHitDice(D8, 1);
+		hp = 8;
+		break;
+	case DRUID:
+		character->SetHitDice(D8, 1);
+		hp = 8;
+		break;
+	case FIGHTER:
+		character->SetHitDice(D10, 1);
+		hp = 10;
+		break;
+	case MONK:
+		character->SetHitDice(D8, 1);
+		hp = 8;
+		break;
+	case PALADIN:
+		character->SetHitDice(D10, 1);
+		hp = 10;
+		break;
+	case RANGER:
+		character->SetHitDice(D10, 1);
+		hp = 10;
+		break;
+	case ROGUE:
+		character->SetHitDice(D8, 1);
+		hp = 8;
+		break;
+	case SORCERER:
+		character->SetHitDice(D6, 1);
+		hp = 6;
+		break;
+	case WARLOCK:
+		character->SetHitDice(D8, 1);
+		hp = 8;
+		break;
+	case WIZARD:
+		character->SetHitDice(D6, 1);
+		hp = 6;
+		break;
+	}
+
+	hp += character->getAbilityModifier(CONSTITUTION);
+	character->SetMaxHitpoints(hp);
+	character->SetCurrentHitpoints(hp);
+
+	int count = character->getLevel() - 1;
+	while (count > 0)
+	{
+		int total_dice_roll = 0;
+		for (int i = 0; i < character->getHitDiceTotal(); i++)
+		{
+			int dice_res = RollDice(character->getHitDiceType());
+
+			if (dice_res == 0) 
+				dice_res = 10;
+
+			total_dice_roll += dice_res;
+		}
+
+		hp = total_dice_roll + character->getAbilityModifier(CONSTITUTION) + character->getMaxHitpoints();
+		character->SetMaxHitpoints(hp);
+		character->SetCurrentHitpoints(hp);
+
+		count--;
+	}
+}
+
 void DisplayCharacterStats(Character* character)
 {
 	std::cout << "-----------------------------------------------" << std::endl;
@@ -467,42 +650,96 @@ void BarbarianSkillOptions(Character* character, int total_trained_allowed)
 		case 0:
 			if (!character->isTrainedInSkill(ANIMAL_HANDLING))
 			{
-				character->MarkSkillTrained(ANIMAL_HANDLING, 1);
+				character->MarkSkillTrained(ANIMAL_HANDLING);
 				total_trained_allowed--;
 			}
 			break;
 		case 1:
 			if (!character->isTrainedInSkill(ATHLETICS))
 			{
-				character->MarkSkillTrained(ATHLETICS, 1);
+				character->MarkSkillTrained(ATHLETICS);
 				total_trained_allowed--;
 			}
 			break;
 		case 2:
 			if (!character->isTrainedInSkill(INTIMIDATION))
 			{
-				character->MarkSkillTrained(INTIMIDATION, 1);
+				character->MarkSkillTrained(INTIMIDATION);
 				total_trained_allowed--;
 			}
 			break;
 		case 3:
 			if (!character->isTrainedInSkill(NATURE))
 			{
-				character->MarkSkillTrained(NATURE, 1);
+				character->MarkSkillTrained(NATURE);
 				total_trained_allowed--;
 			}
 			break;
 		case 4:
 			if (!character->isTrainedInSkill(PERCEPTION))
 			{
-				character->MarkSkillTrained(PERCEPTION, 1);
+				character->MarkSkillTrained(PERCEPTION);
 				total_trained_allowed--;
 			}
 			break;
 		case 5:
 			if (!character->isTrainedInSkill(SURVIVAL))
 			{
-				character->MarkSkillTrained(SURVIVAL, 1);
+				character->MarkSkillTrained(SURVIVAL);
+				total_trained_allowed--;
+			}
+			break;
+		}
+	}
+}
+
+void ClericSkillOptions(Character* character, int total_trained_allowed)
+{
+	while (total_trained_allowed > 0)
+	{
+		int rand_num = GenerateRandomNumber(0, 5); // generate random number between 0 - 5
+
+		switch (rand_num)
+		{
+		case 0:
+			if (!character->isTrainedInSkill(ANIMAL_HANDLING))
+			{
+				character->MarkSkillTrained(ANIMAL_HANDLING);
+				total_trained_allowed--;
+			}
+			break;
+		case 1:
+			if (!character->isTrainedInSkill(ATHLETICS))
+			{
+				character->MarkSkillTrained(ATHLETICS);
+				total_trained_allowed--;
+			}
+			break;
+		case 2:
+			if (!character->isTrainedInSkill(INTIMIDATION))
+			{
+				character->MarkSkillTrained(INTIMIDATION);
+				total_trained_allowed--;
+			}
+			break;
+		case 3:
+			if (!character->isTrainedInSkill(NATURE))
+			{
+				character->MarkSkillTrained(NATURE);
+				total_trained_allowed--;
+			}
+			break;
+		case 4:
+			if (!character->isTrainedInSkill(PERCEPTION))
+			{
+				character->MarkSkillTrained(PERCEPTION);
+				total_trained_allowed--;
+			}
+			break;
+		case 5:
+			if (!character->isTrainedInSkill(SURVIVAL))
+			{
+				character->MarkSkillTrained(SURVIVAL);
 				total_trained_allowed--;
 			}
 			break;

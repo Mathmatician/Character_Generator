@@ -21,7 +21,11 @@ private:
 	int max_hitpoints;
 	int current_hitpoints;
 	int temporary_hitpoints;
-	std::string hitDice; // maybe this is more complicated?
+
+	struct HITDICE {
+		int total = 0;
+		int dice_type = 0;
+	} hitDice;
 
 	std::map<int, int> inventory;
 	float copper;
@@ -33,10 +37,8 @@ private:
 		int failures = 0;
 	} deathSaves;
 
-	struct SKILLS {
-		int trained = 0;
-		int value = 0;
-	} skills[NUM_OF_SKILLS];
+	std::vector<int> saving_throws;
+	std::vector<int> trained_skills;
 	
 	int ability_scores[NUM_OF_ABILITY_SCORES];
 
@@ -65,20 +67,21 @@ public:
 	void SetMoneyAmount(int mny);
 	void AddMoney(int mny);
 	void SubtractMoney(int mny);
-	void SetAbilityScore(int attr_id, int value);
+	bool SetAbilityScore(int attr_id, int value);
 	void AddToAbilityScore(int attr_id, int value);
-	void SetSkill(int skill_id, int value, int trained);
-	void SetSkillValue(int skill_id, int value);
-	void MarkSkillTrained(int skill_id, int trained);
+	void MarkSkillTrained(int skill_id);
+	void UnmarkSkillTrained(int skill_id);
 	bool AddAbility(ABILITIES ability_id);
 	bool RemoveAbility(ABILITIES ability_id);
 	bool HasAbility(ABILITIES ability_id);
 	bool AddFeat(FEATS ability_id);
 	bool RemoveFeat(FEATS ability_id);
 	bool HasFeat(FEATS ability_id);
+	void SetHitDice(int dice_type, int total);
 	void SetDeathSaves(int death_save_id);
 	void ResetDeathSaves();
-	void SetAllSkillsByAbilityModifiers();
+	void MarkSavingThrow(int attr_id);
+	void UnmarkSavingThrow(int attr_id);
 
 	const std::string getCharacterName();
 	const int getLevel();
@@ -98,16 +101,21 @@ public:
 	const int getAbilityScore(int attr_id);
 	const int getAbilityModifier(int attr_id);
 	const int getProficiencyBonus();
+	const int getSavingThrowValue(int attr_id);
 	const int getSkillValue(int skill_id);
+	const int getHitDiceType();
+	const int getHitDiceTotal();
 	const int getMoneyInCoper();
 	const int getMoneyInSilver();
 	const int getMoneyInElectrum();
 	const int getMoneyInGold();
 	const int getMoneyInPlatinum();
 	const bool isTrainedInSkill(int skill_id);
+	const bool hasSavingThrow(int attr_id);
 
 	virtual int ABILITY_LEVEL(ABILITIES ability) = 0;
 
 	static int FEAT_LEVELS(FEATS feat_id);
+	static bool isDwarf(Character* character);
 	static void SelectEquipmentPack(Character* character, int equipment_pack_id);
 };

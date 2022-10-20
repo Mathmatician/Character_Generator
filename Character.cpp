@@ -118,9 +118,13 @@ void Character::SubtractMoney(int mny)
 	copper -= mny;
 }
 
-void Character::SetAbilityScore(int attr_id, int value)
+bool Character::SetAbilityScore(int attr_id, int value)
 {
+	if (value > 20 || value < 3)
+		return false;
+
 	ability_scores[attr_id] = value;
+	return true;
 }
 
 void Character::AddToAbilityScore(int attr_id, int value)
@@ -128,20 +132,24 @@ void Character::AddToAbilityScore(int attr_id, int value)
 	ability_scores[attr_id] += value;
 }
 
-void Character::SetSkill(int skill_id, int value, int trained)
+void Character::MarkSkillTrained(int skill_id)
 {
-	skills[skill_id].value = value;
-	skills[skill_id].trained = trained;
+	if (!isTrainedInSkill(skill_id))
+	{
+		trained_skills.push_back(skill_id);
+	}
+	//skills[skill_id].trained = trained;
 }
 
-void Character::SetSkillValue(int skill_id, int value)
+void Character::UnmarkSkillTrained(int skill_id)
 {
-	skills[skill_id].value = value;
-}
-
-void Character::MarkSkillTrained(int skill_id, int trained)
-{
-	skills[skill_id].trained = trained;
+	for (int i = 0; i < trained_skills.size(); i++)
+	{
+		if (trained_skills[i] == skill_id)
+		{
+			trained_skills.erase(trained_skills.begin() + i);
+		}
+	}
 }
 
 bool Character::AddAbility(ABILITIES ability_id)
@@ -243,6 +251,18 @@ bool Character::HasFeat(FEATS feat_id)
 	return false;
 }
 
+void Character::SetHitDice(int dice_type, int total)
+{
+	if (dice_type < 0)
+		dice_type = 0;
+
+	if (total < 1)
+		total = 1;
+
+	hitDice.dice_type = dice_type;
+	hitDice.total = total;
+}
+
 void Character::SetDeathSaves(int death_save_id)
 {
 	switch (death_save_id)
@@ -262,17 +282,21 @@ void Character::ResetDeathSaves()
 	deathSaves.failures = 0;
 }
 
-void Character::SetAllSkillsByAbilityModifiers()
+void Character::MarkSavingThrow(int attr_id)
 {
-	for (int i = 0; i < NUM_OF_SKILLS; i++)
+	if (!hasSavingThrow(attr_id))
 	{
-		int skill_type = GetSKillType(i);
-		int ability_modifier = getAbilityModifier(skill_type);
-		skills[i].value = ability_modifier;
+		saving_throws.push_back(attr_id);
+	}
+}
 
-		if (skills[i].trained == 1)
+void Character::UnmarkSavingThrow(int attr_id)
+{
+	for (int i = 0; i < saving_throws.size(); i++)
+	{
+		if (saving_throws[i] == attr_id)
 		{
-			skills[i].value += getProficiencyBonus();
+			saving_throws.erase(saving_throws.begin() + i);
 		}
 	}
 }
@@ -359,7 +383,11 @@ const int Character::getAbilityScore(int attr_id)
 
 const int Character::getAbilityModifier(int attr_id)
 {
-	return (ability_scores[attr_id] - 10) / 2;
+	int numerator = (ability_scores[attr_id] - 10);
+	if (numerator < 0 && numerator % 2 != 0)
+		return (numerator / 2) - 1;
+
+	return numerator / 2;
 }
 
 const int Character::getProficiencyBonus()
@@ -367,9 +395,35 @@ const int Character::getProficiencyBonus()
 	return (2 + ((level - 1) / 4));
 }
 
+const int Character::getSavingThrowValue(int attr_id)
+{
+	int mod = getAbilityModifier(attr_id);
+	if (hasSavingThrow(attr_id))
+	{
+		return (mod + getProficiencyBonus());
+	}
+
+	return mod;
+}
+
 const int Character::getSkillValue(int skill_id)
 {
-	return skills[skill_id].value;
+	int mod_val = getAbilityModifier(GetSKillType(skill_id));
+
+	if (isTrainedInSkill(skill_id))
+		return (mod_val + getProficiencyBonus());
+
+	return mod_val;
+}
+
+const int Character::getHitDiceType()
+{
+	return hitDice.dice_type;
+}
+
+const int Character::getHitDiceTotal()
+{
+	return hitDice.total;
 }
 
 const int Character::getMoneyInCoper()
@@ -399,7 +453,24 @@ const int Character::getMoneyInPlatinum()
 
 const bool Character::isTrainedInSkill(int skill_id)
 {
-	return skills[skill_id].trained == 1;
+	for (auto& sk_id : trained_skills)
+	{
+		if (sk_id == skill_id)
+			return true;
+	}
+
+	return false;
+}
+
+const bool Character::hasSavingThrow(int attr_id)
+{
+	for (auto& saveThrows : saving_throws)
+	{
+		if (saveThrows == attr_id)
+			return true;
+	}
+
+	return false;
 }
 
 int Character::FEAT_LEVELS(FEATS feat_id)
@@ -433,6 +504,14 @@ void Character::SelectEquipmentPack(Character* character, int equipment_pack_id)
 		ScholarsPack(character);
 		break;
 	}
+}
+
+bool Character::isDwarf(Character* character)
+{
+	if (character->getRaceId() == HILL_DWARF || character->getRaceId() == MOUNTAIN_DWARF)
+		return true;
+
+	return false;
 }
 
 const std::map<FEATS, int> Character::FEAT_LEVEL_REQUIREMENTS = {

@@ -5,9 +5,7 @@
 
 int main()
 {
-	CharacterCreationProcess(BARBARIAN, ORC, HIGHLANDER, LevelValidator(1), "Jeromash");
-	std::cout << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl;
-	CharacterCreationProcess(CLERIC, DWARF, HIGHLANDER, LevelValidator(10), "Cringle");
+	CharacterCreationProcess(BARBARIAN, HALF_ORC, HIGHLANDER, LevelValidator(1), "Jeromash");
 
 	return 0;
 }

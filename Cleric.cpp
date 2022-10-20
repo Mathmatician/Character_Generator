@@ -24,7 +24,7 @@ void Cleric::EquipmentSelection(Character* character)
 			item_selected = true;
 			break;
 		case 1:
-			if (character->getRaceId() == DWARF)
+			if (isDwarf(character))
 			{
 				character->AddToInventory(WARHAMMER, 1);
 				item_selected = true;

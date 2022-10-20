@@ -1,13 +1,13 @@
 #pragma once
 
 // Dice
-#define D4   "D4"
-#define D6   "D6"
-#define D8   "D8"
-#define D10  "D10"
-#define DP10 "DP10"
-#define D12  "D12"
-#define D20  "D20"
+#define D4   0
+#define D6   1
+#define D8   2
+#define D10  3
+#define DP10 4
+#define D12  5
+#define D20  6
 
 // Death Save definitions
 #define SUCCESS 0
@@ -43,12 +43,16 @@ static enum {
 
 // Races
 static enum {
-	HUMAN,
-	ORC,
-	HALFLING,
-	DRAGONBORN,
+	HILL_DWARF,
+	MOUNTAIN_DWARF,
 	ELF,
-	DWARF,
+	HALFLING,
+	HUMAN,
+	DRAGONBORN,
+	GNOME,
+	HALF_ELF,
+	HALF_ORC,
+	TIEFLING,
 	NUM_OF_RACES
 };
 
@@ -479,16 +483,26 @@ static std::string GetRaceText(int race_id)
 {
 	switch (race_id)
 	{
-	case HUMAN:
-		return "Human";
-	case ORC:
-		return "Orc";
-	case HALFLING:
-		return "Halfling";
-	case DRAGONBORN:
-		return "Dragonborn";
+	case HILL_DWARF:
+		return "Hill Dwarf";
+	case MOUNTAIN_DWARF:
+		return "Mountain Dwarf";
 	case ELF:
 		return "Elf";
+	case HALFLING:
+		return "Halfling";
+	case HUMAN:
+		return "Human";
+	case DRAGONBORN:
+		return "Dragonborn";
+	case GNOME:
+		return "Gnome";
+	case HALF_ELF:
+		return "Half-Elf";
+	case HALF_ORC:
+		return "Half-Orc";
+	case TIEFLING:
+		return "Tiefling";
 	}
 
 	return "";
