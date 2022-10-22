@@ -443,7 +443,8 @@ void SelectTrainedSkillsByClass(Character* character)
 
 void SetArmorClass(Character* character)
 {
-
+	int armor_class_value = GetArmorAC(character->getAttire());
+	character->SetArmorClass(armor_class_value);
 }
 
 void AddEquipmentByBackground(Character* character)

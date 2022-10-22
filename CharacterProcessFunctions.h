@@ -16,7 +16,7 @@ void AddProficiencyByBackground(Character* character);
 void AddAbilityPointsByRace(Character* character);
 void SetCharacterSpeed(Character* character);
 void SelectTrainedSkillsByBackground(Character* character);
-void SelectTrainedSkillsByClass(Character* character)
+void SelectTrainedSkillsByClass(Character* character);
 void SetArmorClass(Character* character);
 void AddEquipmentByBackground(Character* character);
 int LevelValidator(int level);

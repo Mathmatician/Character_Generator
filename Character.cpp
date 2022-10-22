@@ -338,6 +338,11 @@ void Character::ResetDeathSaves()
 	deathSaves.failures = 0;
 }
 
+void Character::SetAttire(ITEMS attire_id)
+{
+	current_attire = attire_id;
+}
+
 void Character::MarkSavingThrow(ABILITY_SCORES attr_id)
 {
 	if (!isProficientWithSavingThrow(attr_id))
@@ -457,6 +462,11 @@ const RACES Character::getRaceId()
 const CLASSES Character::getClassId()
 {
 	return class_ID;
+}
+
+const ITEMS Character::getAttire()
+{
+	return current_attire;
 }
 
 const std::string Character::getAlignment()

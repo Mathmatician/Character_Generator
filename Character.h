@@ -24,6 +24,8 @@ private:
 	int temporary_hitpoints;
 	float copper;
 
+	ITEMS current_attire = ITEMS::NOTHING;
+
 	struct HITDICE {
 		int total = 0;
 		int dice_type = 0;
@@ -96,6 +98,7 @@ public:
 	void SetHitDice(int dice_type, int total);
 	void SetDeathSaves(int death_save_id);
 	void ResetDeathSaves();
+	void SetAttire(ITEMS attire_id);
 	void MarkSavingThrow(ABILITY_SCORES attr_id);
 	void UnmarkSavingThrow(ABILITY_SCORES attr_id);
 	bool AddLanguage(LANGUAGES language);
@@ -111,6 +114,7 @@ public:
 	const std::string getPlayerName();
 	const RACES getRaceId();
 	const CLASSES getClassId();
+	const ITEMS getAttire();
 	const std::string getAlignment();
 	const int getExperiencePoints();
 	const int getArmorClass();

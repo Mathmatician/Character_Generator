@@ -362,7 +362,6 @@ static enum class ITEMS {
 	PRAYER_WHEEL,
 	BELT_POUCH,
 	SIMPLE_WEAPONS,
-	DRUM,
 	NUM_OF_EQUIPMENT_ITEMS
 };
 
@@ -593,4 +592,16 @@ static std::string GetAlignmentText(ALIGNMENTS alignment_id)
 	}
 
 	return "";
+}
+
+static int GetArmorAC(ITEMS armr)
+{
+	switch (armr)
+	{
+	case ITEMS::LEATHER_ARMOR:
+		return 1;
+		break;
+	}
+
+	return -1;
 }
