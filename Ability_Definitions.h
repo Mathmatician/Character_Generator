@@ -1,5 +1,4 @@
 #pragma once
-#include <map>
 
 // All abilities
 static enum class ABILITIES {
@@ -10,4 +9,9 @@ static enum class ABILITIES {
 static enum class FEATS {
 	LINGUIST,
 	NUM_OF_FEATS
+};
+
+static enum class TRAITS {
+	DARK_VISION,
+	NUM_OF_PROFICIENCIES
 };

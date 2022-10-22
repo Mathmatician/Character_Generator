@@ -22,7 +22,7 @@ void Character::SetLevel(int lvl)
 	}
 }
 
-void Character::SetBackground(int bckground)
+void Character::SetBackground(BACKGROUNDS bckground)
 {
 	background = bckground;
 }
@@ -32,12 +32,12 @@ void Character::SetPlayerName(std::string nm)
 	player_name = nm;
 }
 
-void Character::SelectRace(int rc)
+void Character::SelectRace(RACES rc)
 {
 	race = rc;
 }
 
-void Character::SelectAlignment(int algn)
+void Character::SelectAlignment(ALIGNMENTS algn)
 {
 	alignment = algn;
 }
@@ -77,7 +77,7 @@ void Character::SetTemporaryHitpoints(int hp)
 	temporary_hitpoints = hp;
 }
 
-void Character::AddToInventory(int itm, int quantity)
+void Character::AddToInventory(ITEMS itm, int quantity)
 {
 	if (inventory.find(itm) == inventory.end())
 	{
@@ -92,7 +92,7 @@ void Character::AddToInventory(int itm, int quantity)
 	}
 }
 
-void Character::RemoveFromInventory(int itm, int quantity)
+void Character::RemoveFromInventory(ITEMS itm, int quantity)
 {
 	if (inventory.find(itm) != inventory.end())
 	{
@@ -101,6 +101,14 @@ void Character::RemoveFromInventory(int itm, int quantity)
 		if (inventory[itm] <= 0)
 			inventory.erase(itm);
 	}
+}
+
+bool Character::HasItem(ITEMS itm)
+{
+	if (inventory.find(itm) != inventory.end())
+		return true;
+
+	return false;
 }
 
 void Character::SetMoneyAmount(int mny)
@@ -118,36 +126,35 @@ void Character::SubtractMoney(int mny)
 	copper -= mny;
 }
 
-bool Character::SetAbilityScore(int attr_id, int value)
+bool Character::SetAbilityScore(ABILITY_SCORES attr_id, int value)
 {
 	if (value > 20 || value < 3)
 		return false;
 
-	ability_scores[attr_id] = value;
+	ability_scores[(int)attr_id] = value;
 	return true;
 }
 
-void Character::AddToAbilityScore(int attr_id, int value)
+void Character::AddToAbilityScore(ABILITY_SCORES attr_id, int value)
 {
-	ability_scores[attr_id] += value;
+	ability_scores[(int)attr_id] += value;
 }
 
-void Character::MarkSkillTrained(int skill_id)
+void Character::MarkSkillTrained(SKILLS skill_id)
 {
-	if (!isTrainedInSkill(skill_id))
+	if (!isProficientInSkill(skill_id))
 	{
-		trained_skills.push_back(skill_id);
+		proficiencies.trained_skills.push_back(skill_id);
 	}
-	//skills[skill_id].trained = trained;
 }
 
-void Character::UnmarkSkillTrained(int skill_id)
+void Character::UnmarkSkillTrained(SKILLS skill_id)
 {
-	for (int i = 0; i < trained_skills.size(); i++)
+	for (int i = 0; i < proficiencies.trained_skills.size(); i++)
 	{
-		if (trained_skills[i] == skill_id)
+		if (proficiencies.trained_skills[i] == skill_id)
 		{
-			trained_skills.erase(trained_skills.begin() + i);
+			proficiencies.trained_skills.erase(proficiencies.trained_skills.begin() + i);
 		}
 	}
 }
@@ -204,20 +211,69 @@ bool Character::HasAbility(ABILITIES ability_id)
 	return false;
 }
 
+void Character::MarkWeaponProficient(ITEMS itm_id)
+{
+	if (!isProficientWithWeapon(itm_id))
+	{
+		proficiencies.weapons.push_back(itm_id);
+	}
+}
+
+void Character::UnmarkWeaponProficient(ITEMS itm_id)
+{
+	for (int i = 0; i < proficiencies.weapons.size(); i++)
+	{
+		if (proficiencies.weapons[i] == itm_id)
+		{
+			proficiencies.weapons.erase(proficiencies.weapons.begin() + i);
+		}
+	}
+}
+
+void Character::MarkArmorProficient(ITEMS itm_id)
+{
+	if (!isProficientWithArmor(itm_id))
+	{
+		proficiencies.armor.push_back(itm_id);
+	}
+}
+
+void Character::UnmarkArmorProficient(ITEMS itm_id)
+{
+	for (int i = 0; i < proficiencies.armor.size(); i++)
+	{
+		if (proficiencies.armor[i] == itm_id)
+		{
+			proficiencies.armor.erase(proficiencies.armor.begin() + i);
+		}
+	}
+}
+
+void Character::MarkToolsProficient(ITEMS itm_id)
+{
+	if (!isProficientWithTools(itm_id))
+	{
+		proficiencies.tools.push_back(itm_id);
+	}
+}
+
+void Character::UnmarkToolsProficient(ITEMS itm_id)
+{
+	for (int i = 0; i < proficiencies.tools.size(); i++)
+	{
+		if (proficiencies.tools[i] == itm_id)
+		{
+			proficiencies.tools.erase(proficiencies.tools.begin() + i);
+		}
+	}
+}
+
 bool Character::AddFeat(FEATS feat_id)
 {
 	if ((int)feat_id < (int)FEATS::NUM_OF_FEATS && (int)feat_id > -1)
 	{
-		int lvl_req = FEAT_LEVEL_REQUIREMENTS.at(feat_id);
-
-		if (level >= lvl_req)
+		if (!HasFeat(feat_id))
 		{
-			for (auto& ft_id : feat_list)
-			{
-				if (ft_id == feat_id)
-					return false;
-			}
-
 			feat_list.push_back(feat_id);
 			return true;
 		}
@@ -282,23 +338,95 @@ void Character::ResetDeathSaves()
 	deathSaves.failures = 0;
 }
 
-void Character::MarkSavingThrow(int attr_id)
+void Character::MarkSavingThrow(ABILITY_SCORES attr_id)
 {
-	if (!hasSavingThrow(attr_id))
+	if (!isProficientWithSavingThrow(attr_id))
 	{
-		saving_throws.push_back(attr_id);
+		proficiencies.saving_throws.push_back(attr_id);
 	}
 }
 
-void Character::UnmarkSavingThrow(int attr_id)
+void Character::UnmarkSavingThrow(ABILITY_SCORES attr_id)
 {
-	for (int i = 0; i < saving_throws.size(); i++)
+	for (int i = 0; i < proficiencies.saving_throws.size(); i++)
 	{
-		if (saving_throws[i] == attr_id)
+		if (proficiencies.saving_throws[i] == attr_id)
 		{
-			saving_throws.erase(saving_throws.begin() + i);
+			proficiencies.saving_throws.erase(proficiencies.saving_throws.begin() + i);
 		}
 	}
+}
+
+bool Character::AddLanguage(LANGUAGES language)
+{
+	if (!SpeaksLanguage(language))
+	{
+		language_list.push_back(language);
+		return true;
+	}
+
+	return false;
+}
+
+bool Character::RemoveLanguage(LANGUAGES language)
+{
+	for (int i = 0; i < language_list.size(); i++)
+	{
+		if (language_list[i] == language)
+		{
+			language_list.erase(language_list.begin() + i);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Character::AddLanguage(EXOTIC_LANGUAGES exotic_language)
+{
+	if (!SpeaksLanguage(exotic_language))
+	{
+		exotic_language_list.push_back(exotic_language);
+		return true;
+	}
+
+	return false;
+}
+
+bool Character::RemoveLanguage(EXOTIC_LANGUAGES exotic_language)
+{
+	for (int i = 0; i < exotic_language_list.size(); i++)
+	{
+		if (exotic_language_list[i] == exotic_language)
+		{
+			exotic_language_list.erase(exotic_language_list.begin() + i);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Character::SpeaksLanguage(LANGUAGES language)
+{
+	for (auto& lang : language_list)
+	{
+		if (lang == language)
+			return true;
+	}
+
+	return false;
+}
+
+bool Character::SpeaksLanguage(EXOTIC_LANGUAGES exotic_language)
+{
+	for (auto& lang : exotic_language_list)
+	{
+		if (lang == exotic_language)
+			return true;
+	}
+
+	return false;
 }
 
 const std::string Character::getCharacterName()
@@ -311,7 +439,7 @@ const int Character::getLevel()
 	return level;
 }
 
-const int Character::getBackground()
+const BACKGROUNDS Character::getBackground()
 {
 	return background;
 }
@@ -321,12 +449,12 @@ const std::string Character::getPlayerName()
 	return player_name;
 }
 
-const int Character::getRaceId()
+const RACES Character::getRaceId()
 {
 	return race;
 }
 
-const int Character::getClassId()
+const CLASSES Character::getClassId()
 {
 	return class_ID;
 }
@@ -371,19 +499,19 @@ const int Character::getTemporaryHitpoints()
 	return temporary_hitpoints;
 }
 
-const std::map<int, int>& Character::getInventory()
+const std::map<ITEMS, int>& Character::getInventory()
 {
 	return inventory;
 }
 
-const int Character::getAbilityScore(int attr_id)
+const int Character::getAbilityScore(ABILITY_SCORES attr_id)
 {
-	return ability_scores[attr_id];
+	return ability_scores[(int)attr_id];
 }
 
-const int Character::getAbilityModifier(int attr_id)
+const int Character::getAbilityModifier(ABILITY_SCORES attr_id)
 {
-	int numerator = (ability_scores[attr_id] - 10);
+	int numerator = (ability_scores[(int)attr_id] - 10);
 	if (numerator < 0 && numerator % 2 != 0)
 		return (numerator / 2) - 1;
 
@@ -395,10 +523,10 @@ const int Character::getProficiencyBonus()
 	return (2 + ((level - 1) / 4));
 }
 
-const int Character::getSavingThrowValue(int attr_id)
+const int Character::getSavingThrowValue(ABILITY_SCORES attr_id)
 {
 	int mod = getAbilityModifier(attr_id);
-	if (hasSavingThrow(attr_id))
+	if (isProficientWithSavingThrow(attr_id))
 	{
 		return (mod + getProficiencyBonus());
 	}
@@ -406,11 +534,11 @@ const int Character::getSavingThrowValue(int attr_id)
 	return mod;
 }
 
-const int Character::getSkillValue(int skill_id)
+const int Character::getSkillValue(SKILLS skill_id)
 {
 	int mod_val = getAbilityModifier(GetSKillType(skill_id));
 
-	if (isTrainedInSkill(skill_id))
+	if (isProficientInSkill(skill_id))
 		return (mod_val + getProficiencyBonus());
 
 	return mod_val;
@@ -451,9 +579,9 @@ const int Character::getMoneyInPlatinum()
 	return copper / PLATINUM;
 }
 
-const bool Character::isTrainedInSkill(int skill_id)
+const bool Character::isProficientInSkill(SKILLS skill_id)
 {
-	for (auto& sk_id : trained_skills)
+	for (auto& sk_id : proficiencies.trained_skills)
 	{
 		if (sk_id == skill_id)
 			return true;
@@ -462,9 +590,42 @@ const bool Character::isTrainedInSkill(int skill_id)
 	return false;
 }
 
-const bool Character::hasSavingThrow(int attr_id)
+const bool Character::isProficientWithArmor(ITEMS itm_id)
 {
-	for (auto& saveThrows : saving_throws)
+	for (auto& itm : proficiencies.armor)
+	{
+		if (itm == itm_id)
+			return true;
+	}
+
+	return false;
+}
+
+const bool Character::isProficientWithWeapon(ITEMS itm_id)
+{
+	for (auto& itm : proficiencies.weapons)
+	{
+		if (itm == itm_id)
+			return true;
+	}
+
+	return false;
+}
+
+const bool Character::isProficientWithTools(ITEMS itm_id)
+{
+	for (auto& itm : proficiencies.tools)
+	{
+		if (itm == itm_id)
+			return true;
+	}
+
+	return false;
+}
+
+const bool Character::isProficientWithSavingThrow(ABILITY_SCORES attr_id)
+{
+	for (auto& saveThrows : proficiencies.saving_throws)
 	{
 		if (saveThrows == attr_id)
 			return true;
@@ -473,34 +634,29 @@ const bool Character::hasSavingThrow(int attr_id)
 	return false;
 }
 
-int Character::FEAT_LEVELS(FEATS feat_id)
-{
-	return FEAT_LEVEL_REQUIREMENTS.at(feat_id);
-}
-
-void Character::SelectEquipmentPack(Character* character, int equipment_pack_id)
+void Character::SelectEquipmentPack(Character* character, EQUIPMENT_PACKS equipment_pack_id)
 {
 	switch (equipment_pack_id)
 	{
-	case BURGLERS_PACK:
+	case EQUIPMENT_PACKS::BURGLERS_PACK:
 		BurglersPack(character);
 		break;
-	case DIPLOMATS_PACK:
+	case EQUIPMENT_PACKS::DIPLOMATS_PACK:
 		DiplomatsPack(character);
 		break;
-	case DUNGEONEERS_PACK:
+	case EQUIPMENT_PACKS::DUNGEONEERS_PACK:
 		DungeoneersPack(character);
 		break;
-	case ENTERTAINERS_PACK:
+	case EQUIPMENT_PACKS::ENTERTAINERS_PACK:
 		EntertainersPack(character);
 		break;
-	case EXPLORERS_PACK:
+	case EQUIPMENT_PACKS::EXPLORERS_PACK:
 		ExploerersPack(character);
 		break;
-	case PRIESTS_PACK:
+	case EQUIPMENT_PACKS::PRIESTS_PACK:
 		PriestsPack(character);
 		break;
-	case SCHOLARS_PACK:
+	case EQUIPMENT_PACKS::SCHOLARS_PACK:
 		ScholarsPack(character);
 		break;
 	}
@@ -508,12 +664,8 @@ void Character::SelectEquipmentPack(Character* character, int equipment_pack_id)
 
 bool Character::isDwarf(Character* character)
 {
-	if (character->getRaceId() == HILL_DWARF || character->getRaceId() == MOUNTAIN_DWARF)
+	if (character->getRaceId() == RACES::HILL_DWARF || character->getRaceId() == RACES::MOUNTAIN_DWARF)
 		return true;
 
 	return false;
 }
-
-const std::map<FEATS, int> Character::FEAT_LEVEL_REQUIREMENTS = {
-	{FEATS::LINGUIST, 1}
-};

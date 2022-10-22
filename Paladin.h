@@ -6,6 +6,8 @@ private:
 	static const std::map<ABILITIES, int> PALADIN_ABILITY_LEVELS;
 
 public:
+	Paladin(RACES race_id, BACKGROUNDS background_id);
 	virtual int ABILITY_LEVEL(ABILITIES ability);
-	Paladin();
+	static void EquipmentSelection(Character* character);
+	static void SkillOptions(Character* character, int total_trained_allowed);
 };

@@ -5,7 +5,7 @@
 
 int main()
 {
-	CharacterCreationProcess(BARBARIAN, HALF_ORC, HIGHLANDER, LevelValidator(1), "Jeromash");
+	CharacterCreationProcess(CLASSES::BARBARIAN, RACES::HALF_ORC, BACKGROUNDS::OUTLANDER, LevelValidator(1), "Jeromash");
 
 	return 0;
 }

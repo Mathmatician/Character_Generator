@@ -23,8 +23,10 @@
 #define GOLD		100
 #define PLATINUM	1000
 
+
 // Character Classes
-static enum {
+static enum class CLASSES {
+	NOTHING = -1,
 	ARTIFICER,
 	BARBARIAN,
 	BARD,
@@ -42,7 +44,8 @@ static enum {
 };
 
 // Races
-static enum {
+static enum class RACES {
+	NOTHING = -1,
 	HILL_DWARF,
 	MOUNTAIN_DWARF,
 	ELF,
@@ -56,14 +59,56 @@ static enum {
 	NUM_OF_RACES
 };
 
+// Languages
+static enum class LANGUAGES {
+	NOTHING = -1,
+	COMMON_LANGUAGE,
+	DWARVISH_LANGUAGE,
+	ELVISH_LANGUAGE,
+	GIANT_LANGUAGE,
+	GNOMISH_LANGUAGE,
+	GOBLIN_LANGUAGE,
+	HALFLING_LANGUAGE,
+	ORC_LANGUAGE,
+	NUM_OF_LANGUAGES
+};
+
+// Exotic Languages
+static enum class EXOTIC_LANGUAGES {
+	NOTHING = -1,
+	ABYSSAL_LANGUAGE,
+	CELESTIAL_LANGUAGE,
+	DRACONIC_LANGUAGE,
+	DEEP_SPEECH_LANGUAGE,
+	INFERNAL_LANGUAGE,
+	PRIMORDIAL_LANGUAGE,
+	SYLVAN_LANGUAGE,
+	UNDERCOMMON_LANGUAGE,
+	NUM_OF_EXOTIC_LANGUAGES
+};
+
 // Backgrounds
-static enum {
-	HIGHLANDER,
+static enum class BACKGROUNDS {
+	NOTHING = -1,
+	ACOLYTE,
+	CHARLATAN,
+	CRIMINAL,
+	ENTERTAINER,
+	FOLK_HERO,
+	GUILD_ARTISAN,
+	HERMIT,
+	NOBLE,
+	OUTLANDER,
+	SAGE,
+	SAILOR,
+	SOLDIER,
+	URCHIN,
 	NUM_OF_BACKGROUNDS
 };
 
 // Alignment
-static enum {
+static enum class ALIGNMENTS {
+	NOTHING = -1,
 	LAWFUL_GOOD,
 	GOOD,
 	CHAOTIC_GOOD,
@@ -77,7 +122,8 @@ static enum {
 };
 
 // Ability Score
-static enum {
+static enum class ABILITY_SCORES {
+	NOTHING = -1,
 	STRENGTH,
 	DEXTERITY,
 	CONSTITUTION,
@@ -88,7 +134,8 @@ static enum {
 };
 
 // Skills
-static enum {
+static enum class SKILLS {
+	NOTHING = -1,
 	ACROBATICS,
 	ANIMAL_HANDLING,
 	ARCANA,
@@ -111,7 +158,8 @@ static enum {
 };
 
 // Equipment Packs
-static enum {
+static enum class EQUIPMENT_PACKS {
+	NOTHING = -1,
 	BURGLERS_PACK,
 	DIPLOMATS_PACK,
 	DUNGEONEERS_PACK,
@@ -122,8 +170,13 @@ static enum {
 	NUM_OF_EQUIPMENT_PACKS
 };
 
+
 // Equipment (and there's a LOT)
-static enum {
+static enum class ITEMS {
+	NOTHING = -1,
+	LIGHT_ARMOR,
+	MEDIUM_ARMOR,
+	HEAVY_ARMOR,
 	LIGHT_ARMOR_PADDED,
 	LIGHT_ARMOR_LEATHER,
 	LIGHT_ARMOR_STUDDED_LEATHER,
@@ -181,6 +234,7 @@ static enum {
 	FLASK_OF_ALCHEMIST_FIRE,
 	ARROW,
 	BLOCKS_OF_INCENSE,
+	STICKS_OF_INCENSE,
 	BLOWGUN_NEEDLE,
 	CENSER,
 	CROSSBOW_BOLT,
@@ -303,164 +357,170 @@ static enum {
 	PAN_FLUTE,
 	SHAWM,
 	VIOL,
+	HOLY_SYMBOL,
+	PRAYER_BOOK,
+	PRAYER_WHEEL,
+	BELT_POUCH,
+	SIMPLE_WEAPONS,
+	DRUM,
 	NUM_OF_EQUIPMENT_ITEMS
 };
 
-static int GetSKillType(int skill)
+static ABILITY_SCORES GetSKillType(SKILLS skill)
 {
 	switch (skill)
 	{
-	case ACROBATICS:
-		return DEXTERITY;
-	case ANIMAL_HANDLING:
-		return WISDOM;
-	case ARCANA:
-		return INTELLIGENCE;
-	case ATHLETICS:
-		return STRENGTH;
-	case DECEPTION:
-		return CHARISMA;
-	case HISTORY:
-		return INTELLIGENCE;
-	case INSIGHT:
-		return WISDOM;
-	case INTIMIDATION:
-		return CHARISMA;
-	case INVESTIGATION:
-		return INTELLIGENCE;
-	case MEDICINE:
-		return WISDOM;
-	case NATURE:
-		return INTELLIGENCE;
-	case PERCEPTION:
-		return WISDOM;
-	case PERFORMANCE:
-		return CHARISMA;
-	case PERSUASION:
-		return CHARISMA;
-	case RELIGION:
-		return INTELLIGENCE;
-	case SLEIGHT_OF_HAND:
-		return DEXTERITY;
-	case STEALTH:
-		return DEXTERITY;
-	case SURVIVAL:
-		return WISDOM;
+	case SKILLS::ACROBATICS:
+		return ABILITY_SCORES::DEXTERITY;
+	case SKILLS::ANIMAL_HANDLING:
+		return ABILITY_SCORES::WISDOM;
+	case SKILLS::ARCANA:
+		return ABILITY_SCORES::INTELLIGENCE;
+	case SKILLS::ATHLETICS:
+		return ABILITY_SCORES::STRENGTH;
+	case SKILLS::DECEPTION:
+		return ABILITY_SCORES::CHARISMA;
+	case SKILLS::HISTORY:
+		return ABILITY_SCORES::INTELLIGENCE;
+	case SKILLS::INSIGHT:
+		return ABILITY_SCORES::WISDOM;
+	case SKILLS::INTIMIDATION:
+		return ABILITY_SCORES::CHARISMA;
+	case SKILLS::INVESTIGATION:
+		return ABILITY_SCORES::INTELLIGENCE;
+	case SKILLS::MEDICINE:
+		return ABILITY_SCORES::WISDOM;
+	case SKILLS::NATURE:
+		return ABILITY_SCORES::INTELLIGENCE;
+	case SKILLS::PERCEPTION:
+		return ABILITY_SCORES::WISDOM;
+	case SKILLS::PERFORMANCE:
+		return ABILITY_SCORES::CHARISMA;
+	case SKILLS::PERSUASION:
+		return ABILITY_SCORES::CHARISMA;
+	case SKILLS::RELIGION:
+		return ABILITY_SCORES::INTELLIGENCE;
+	case SKILLS::SLEIGHT_OF_HAND:
+		return ABILITY_SCORES::DEXTERITY;
+	case SKILLS::STEALTH:
+		return ABILITY_SCORES::DEXTERITY;
+	case SKILLS::SURVIVAL:
+		return ABILITY_SCORES::WISDOM;
 	}
 
-	return -1;
+	return ABILITY_SCORES::NOTHING;
 }
 
-static std::string GetSKillTypeText(int skill)
+static std::string GetSKillTypeText(SKILLS skill)
 {
 	switch (skill)
 	{
-	case ACROBATICS:
+	case SKILLS::ACROBATICS:
 		return "DEXTERITY";
-	case ANIMAL_HANDLING:
+	case SKILLS::ANIMAL_HANDLING:
 		return "WISDOM";
-	case ARCANA:
+	case SKILLS::ARCANA:
 		return "INTELLIGENCE";
-	case ATHLETICS:
+	case SKILLS::ATHLETICS:
 		return "STRENGTH";
-	case DECEPTION:
+	case SKILLS::DECEPTION:
 		return "CHARISMA";
-	case HISTORY:
+	case SKILLS::HISTORY:
 		return "INTELLIGENCE";
-	case INSIGHT:
+	case SKILLS::INSIGHT:
 		return "WISDOM";
-	case INTIMIDATION:
+	case SKILLS::INTIMIDATION:
 		return "CHARISMA";
-	case INVESTIGATION:
+	case SKILLS::INVESTIGATION:
 		return "INTELLIGENCE";
-	case MEDICINE:
+	case SKILLS::MEDICINE:
 		return "WISDOM";
-	case NATURE:
+	case SKILLS::NATURE:
 		return "INTELLIGENCE";
-	case PERCEPTION:
+	case SKILLS::PERCEPTION:
 		return "WISDOM";
-	case PERFORMANCE:
+	case SKILLS::PERFORMANCE:
 		return "CHARISMA";
-	case PERSUASION:
+	case SKILLS::PERSUASION:
 		return "CHARISMA";
-	case RELIGION:
+	case SKILLS::RELIGION:
 		return "INTELLIGENCE";
-	case SLEIGHT_OF_HAND:
+	case SKILLS::SLEIGHT_OF_HAND:
 		return "DEXTERITY";
-	case STEALTH:
+	case SKILLS::STEALTH:
 		return "DEXTERITY";
-	case SURVIVAL:
+	case SKILLS::SURVIVAL:
 		return "WISDOM";
 	}
 
 	return "";
 }
 
-static std::string GetSkillText(int skill)
+static std::string GetSkillText(SKILLS skill)
 {
 	switch (skill)
 	{
-	case ACROBATICS:
+	case SKILLS::ACROBATICS:
 		return "ACROBATICS";
-	case ANIMAL_HANDLING:
+	case SKILLS::ANIMAL_HANDLING:
 		return "ANIMAL_HANDLING";
-	case ARCANA:
+	case SKILLS::ARCANA:
 		return "ARCANA";
-	case ATHLETICS:
+	case SKILLS::ATHLETICS:
 		return "ATHLETICS";
-	case DECEPTION:
+	case SKILLS::DECEPTION:
 		return "DECEPTION";
-	case HISTORY:
+	case SKILLS::HISTORY:
 		return "HISTORY";
-	case INSIGHT:
+	case SKILLS::INSIGHT:
 		return "INSIGHT";
-	case INTIMIDATION:
+	case SKILLS::INTIMIDATION:
 		return "INTIMIDATION";
-	case INVESTIGATION:
+	case SKILLS::INVESTIGATION:
 		return "INVESTIGATION";
-	case MEDICINE:
+	case SKILLS::MEDICINE:
 		return "MEDICINE";
-	case NATURE:
+	case SKILLS::NATURE:
 		return "NATURE";
-	case PERCEPTION:
+	case SKILLS::PERCEPTION:
 		return "PERCEPTION";
-	case PERFORMANCE:
+	case SKILLS::PERFORMANCE:
 		return "PERFORMANCE";
-	case PERSUASION:
+	case SKILLS::PERSUASION:
 		return "PERSUASION";
-	case RELIGION:
+	case SKILLS::RELIGION:
 		return "RELIGION";
-	case SLEIGHT_OF_HAND:
+	case SKILLS::SLEIGHT_OF_HAND:
 		return "SLEIGHT_OF_HAND";
-	case STEALTH:
+	case SKILLS::STEALTH:
 		return "STEALTH";
-	case SURVIVAL:
+	case SKILLS::SURVIVAL:
 		return "SURVIVAL";
 	}
 
 	return "";
 }
 
-static std::string GetAbilityScoreText(int ability_id)
+static std::string GetAbilityScoreText(ABILITY_SCORES ability_id)
 {
 	switch (ability_id)
 	{
-	case STRENGTH:
+	case ABILITY_SCORES::STRENGTH:
 		return "STRENGTH";
 		break;
-	case DEXTERITY:
+	case ABILITY_SCORES::DEXTERITY:
 		return "DEXTERITY";
 		break;
-	case CONSTITUTION:
+	case ABILITY_SCORES::CONSTITUTION:
 		return "CONSTITUTION";
 		break;
-	case INTELLIGENCE:
+	case ABILITY_SCORES::INTELLIGENCE:
 		return "INTELLIGENCE";
 		break;
-	case WISDOM:
+	case ABILITY_SCORES::WISDOM:
 		return "WISDOM";
 		break;
-	case CHARISMA:
+	case ABILITY_SCORES::CHARISMA:
 		return "CHARISMA";
 		break;
 	}
@@ -468,67 +528,67 @@ static std::string GetAbilityScoreText(int ability_id)
 	return "";
 }
 
-static std::string GetBackgroundText(int background_id)
+static std::string GetBackgroundText(BACKGROUNDS background_id)
 {
 	switch (background_id)
 	{
-	case HIGHLANDER:
-		return "Highlander";
+	case BACKGROUNDS::ACOLYTE:
+		return "Acolyte";
 	}
 
 	return "";
 }
 
-static std::string GetRaceText(int race_id)
+static std::string GetRaceText(RACES race_id)
 {
 	switch (race_id)
 	{
-	case HILL_DWARF:
+	case RACES::HILL_DWARF:
 		return "Hill Dwarf";
-	case MOUNTAIN_DWARF:
+	case RACES::MOUNTAIN_DWARF:
 		return "Mountain Dwarf";
-	case ELF:
+	case RACES::ELF:
 		return "Elf";
-	case HALFLING:
+	case RACES::HALFLING:
 		return "Halfling";
-	case HUMAN:
+	case RACES::HUMAN:
 		return "Human";
-	case DRAGONBORN:
+	case RACES::DRAGONBORN:
 		return "Dragonborn";
-	case GNOME:
+	case RACES::GNOME:
 		return "Gnome";
-	case HALF_ELF:
+	case RACES::HALF_ELF:
 		return "Half-Elf";
-	case HALF_ORC:
+	case RACES::HALF_ORC:
 		return "Half-Orc";
-	case TIEFLING:
+	case RACES::TIEFLING:
 		return "Tiefling";
 	}
 
 	return "";
 }
 
-static std::string GetAlignmentText(int alignment_id)
+static std::string GetAlignmentText(ALIGNMENTS alignment_id)
 {
 	switch (alignment_id)
 	{
-	case LAWFUL_GOOD:
+	case ALIGNMENTS::LAWFUL_GOOD:
 		return "Lawful Good";
-	case GOOD:
+	case ALIGNMENTS::GOOD:
 		return "Good";
-	case CHAOTIC_GOOD:
+	case ALIGNMENTS::CHAOTIC_GOOD:
 		return "Chaotic Good";
-	case LAWFUL_NEUTRAL:
+	case ALIGNMENTS::LAWFUL_NEUTRAL:
 		return "Lawful Neutral";
-	case NEUTRAL:
+	case ALIGNMENTS::NEUTRAL:
 		return "Neutral";
-	case CHAOTIC_NEUTRAL:
+	case ALIGNMENTS::CHAOTIC_NEUTRAL:
 		return "Chaotic Neutral";
-	case LAWFUL_EVIL:
+	case ALIGNMENTS::LAWFUL_EVIL:
 		return "Lawful Evil";
-	case EVIL:
+	case ALIGNMENTS::EVIL:
 		return "Evil";
-	case CHAOTIC_EVIL:
+	case ALIGNMENTS::CHAOTIC_EVIL:
 		return "Chaotic Evil";
 	}
 

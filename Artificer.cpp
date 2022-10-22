@@ -1,10 +1,15 @@
 #include "Artificer.h"
 #include <iostream>
 
-Artificer::Artificer()
+Artificer::Artificer(RACES race_id, BACKGROUNDS background_id)
 {
-	class_ID = ARTIFICER;
+	class_ID = CLASSES::ARTIFICER;
+	SelectRace(race_id);
+	SetBackground(background_id);
 	abilities_map = &ARTIFICER_ABILITY_LEVELS;
+	Artificer::EquipmentSelection(this);
+	SetHitDice(D12, 1);
+	SetMaxHitpoints(8);
 }
 
 int Artificer::ABILITY_LEVEL(ABILITIES ability)
@@ -13,6 +18,11 @@ int Artificer::ABILITY_LEVEL(ABILITIES ability)
 }
 
 void Artificer::EquipmentSelection(Character* character)
+{
+
+}
+
+void Artificer::SkillOptions(Character* character, int total_trained_allowed)
 {
 
 }

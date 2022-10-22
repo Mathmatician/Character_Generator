@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <map>
 
 #include "definitions.h"
 #include "Ability_Definitions.h"
@@ -9,11 +10,11 @@
 class Character {
 private:
 	std::string character_name;
-	int level;
-	int background;
+	int level = 1;
+	BACKGROUNDS background;
 	std::string player_name;
-	int race;
-	int alignment;
+	RACES race;
+	ALIGNMENTS alignment;
 	int experience_points;
 	int armor_class;
 	int initiative;
@@ -21,40 +22,48 @@ private:
 	int max_hitpoints;
 	int current_hitpoints;
 	int temporary_hitpoints;
+	float copper;
 
 	struct HITDICE {
 		int total = 0;
 		int dice_type = 0;
 	} hitDice;
 
-	std::map<int, int> inventory;
-	float copper;
-	std::vector<ABILITIES> ability_list;
-	std::vector<FEATS> feat_list;
-
 	struct DeathSaves {
 		int successes = 0;
 		int failures = 0;
 	} deathSaves;
 
-	std::vector<int> saving_throws;
-	std::vector<int> trained_skills;
+	std::map<ITEMS, int> inventory;
+	std::vector<ABILITIES> ability_list;
+	std::vector<FEATS> feat_list;
+	std::vector<TRAITS> trait_list;
+	std::vector<LANGUAGES> language_list;
+	std::vector<EXOTIC_LANGUAGES> exotic_language_list;
+
+	struct Proficiencies {
+		std::vector<ITEMS> armor;
+		std::vector<ITEMS> weapons;
+		std::vector<ITEMS> tools;
+		std::vector<ABILITY_SCORES> saving_throws;
+		std::vector<SKILLS> trained_skills;
+	} proficiencies;
 	
-	int ability_scores[NUM_OF_ABILITY_SCORES];
+	int ability_scores[(int)ABILITY_SCORES::NUM_OF_ABILITY_SCORES];
 
 	static const std::map<FEATS, int> FEAT_LEVEL_REQUIREMENTS;
 
 protected:
-	int class_ID;
+	CLASSES class_ID;
 	const std::map<ABILITIES, int>* abilities_map;
 
 public:
 	void SetCharacterName(std::string nm);
 	void SetLevel(int lvl);
-	void SetBackground(int bckground);
+	void SetBackground(BACKGROUNDS bckground);
 	void SetPlayerName(std::string nm);
-	void SelectRace(int rc);
-	void SelectAlignment(int algn);
+	void SelectRace(RACES rc);
+	void SelectAlignment(ALIGNMENTS algn);
 	void SetExperiencePoints(int exp);
 	void SetArmorClass(int ac);
 	void SetInitiative(int init);
@@ -62,33 +71,46 @@ public:
 	void SetMaxHitpoints(int hp);
 	void SetCurrentHitpoints(int hp);
 	void SetTemporaryHitpoints(int hp);
-	void AddToInventory(int itm, int quantity);
-	void RemoveFromInventory(int, int quantity);
+	void AddToInventory(ITEMS itm, int quantity);
+	void RemoveFromInventory(ITEMS, int quantity);
+	bool HasItem(ITEMS itm);
 	void SetMoneyAmount(int mny);
 	void AddMoney(int mny);
 	void SubtractMoney(int mny);
-	bool SetAbilityScore(int attr_id, int value);
-	void AddToAbilityScore(int attr_id, int value);
-	void MarkSkillTrained(int skill_id);
-	void UnmarkSkillTrained(int skill_id);
+	bool SetAbilityScore(ABILITY_SCORES attr_id, int value);
+	void AddToAbilityScore(ABILITY_SCORES attr_id, int value);
+	void MarkSkillTrained(SKILLS skill_id);
+	void UnmarkSkillTrained(SKILLS skill_id);
 	bool AddAbility(ABILITIES ability_id);
 	bool RemoveAbility(ABILITIES ability_id);
 	bool HasAbility(ABILITIES ability_id);
+	void MarkWeaponProficient(ITEMS itm_id);
+	void UnmarkWeaponProficient(ITEMS itm_id);
+	void MarkArmorProficient(ITEMS itm_id);
+	void UnmarkArmorProficient(ITEMS itm_id);
+	void MarkToolsProficient(ITEMS itm_id);
+	void UnmarkToolsProficient(ITEMS itm_id);
 	bool AddFeat(FEATS ability_id);
 	bool RemoveFeat(FEATS ability_id);
 	bool HasFeat(FEATS ability_id);
 	void SetHitDice(int dice_type, int total);
 	void SetDeathSaves(int death_save_id);
 	void ResetDeathSaves();
-	void MarkSavingThrow(int attr_id);
-	void UnmarkSavingThrow(int attr_id);
+	void MarkSavingThrow(ABILITY_SCORES attr_id);
+	void UnmarkSavingThrow(ABILITY_SCORES attr_id);
+	bool AddLanguage(LANGUAGES language);
+	bool RemoveLanguage(LANGUAGES language);
+	bool AddLanguage(EXOTIC_LANGUAGES exotic_language);
+	bool RemoveLanguage(EXOTIC_LANGUAGES exotic_language);
+	bool SpeaksLanguage(LANGUAGES language);
+	bool SpeaksLanguage(EXOTIC_LANGUAGES exotic_language);
 
 	const std::string getCharacterName();
 	const int getLevel();
-	const int getBackground();
+	const BACKGROUNDS getBackground();
 	const std::string getPlayerName();
-	const int getRaceId();
-	const int getClassId();
+	const RACES getRaceId();
+	const CLASSES getClassId();
 	const std::string getAlignment();
 	const int getExperiencePoints();
 	const int getArmorClass();
@@ -97,12 +119,12 @@ public:
 	const int getMaxHitpoints();
 	const int getCurrentHitpoints();
 	const int getTemporaryHitpoints();
-	const std::map<int, int>& getInventory();
-	const int getAbilityScore(int attr_id);
-	const int getAbilityModifier(int attr_id);
+	const std::map<ITEMS, int>& getInventory();
+	const int getAbilityScore(ABILITY_SCORES attr_id);
+	const int getAbilityModifier(ABILITY_SCORES attr_id);
 	const int getProficiencyBonus();
-	const int getSavingThrowValue(int attr_id);
-	const int getSkillValue(int skill_id);
+	const int getSavingThrowValue(ABILITY_SCORES attr_id);
+	const int getSkillValue(SKILLS skill_id);
 	const int getHitDiceType();
 	const int getHitDiceTotal();
 	const int getMoneyInCoper();
@@ -110,12 +132,14 @@ public:
 	const int getMoneyInElectrum();
 	const int getMoneyInGold();
 	const int getMoneyInPlatinum();
-	const bool isTrainedInSkill(int skill_id);
-	const bool hasSavingThrow(int attr_id);
+	const bool isProficientInSkill(SKILLS skill_id);
+	const bool isProficientWithArmor(ITEMS itm_id);
+	const bool isProficientWithWeapon(ITEMS itm_id);
+	const bool isProficientWithTools(ITEMS itm_id);
+	const bool isProficientWithSavingThrow(ABILITY_SCORES attr_id);
 
 	virtual int ABILITY_LEVEL(ABILITIES ability) = 0;
 
-	static int FEAT_LEVELS(FEATS feat_id);
 	static bool isDwarf(Character* character);
-	static void SelectEquipmentPack(Character* character, int equipment_pack_id);
+	static void SelectEquipmentPack(Character* character, EQUIPMENT_PACKS equipment_pack_id);
 };
