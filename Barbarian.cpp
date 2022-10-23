@@ -18,8 +18,6 @@ Barbarian::Barbarian(RACES race_id, BACKGROUNDS background_id)
 
 	MarkSavingThrow(ABILITY_SCORES::STRENGTH);
 	MarkSavingThrow(ABILITY_SCORES::CONSTITUTION);
-
-	Barbarian::EquipmentSelection(this);
 }
 
 int Barbarian::ABILITY_LEVEL(ABILITIES ability)
@@ -184,6 +182,170 @@ void Barbarian::SkillOptions(Character* character, int total_trained_allowed)
 				total_trained_allowed--;
 			}
 			break;
+		}
+	}
+}
+
+void Barbarian::EquipItems(Character* character)
+{
+	bool selectionMade = false;
+	bool wearArmor = GenerateRandomNumber(0, 1);
+	int selection;
+	
+	// select armor if wearArmor is true
+	if (wearArmor)
+	{
+		std::vector<ITEMS> all_armor;
+		const std::map<ITEMS, int>& inventory = character->getInventory();
+
+		for (auto& item : inventory)
+		{
+			if (isArmor(item.first))
+				all_armor.push_back(item.first);
+		}
+
+		if (all_armor.size() > 0)
+		{
+			selection = GenerateRandomNumber(0, all_armor.size() - 1);
+			character->SetAttire(all_armor[selection]);
+		}
+	}
+	else
+	{
+		character->SetAttire(ITEMS::NOTHING);
+	}
+
+	// Equip weapons
+	while (!selectionMade)
+	{
+		selection = GenerateRandomNumber(0, 3);
+
+		if (selection == 0) // two handed weapon
+		{
+			std::vector<ITEMS> all_two_handed_weapons;
+			const std::map<ITEMS, int>& inventory = character->getInventory();
+
+			for (auto& item : inventory)
+			{
+				if (isTwoHandedWeapon(item.first))
+					all_two_handed_weapons.push_back(item.first);
+			}
+
+			if (all_two_handed_weapons.size() > 0)
+			{
+				selection = GenerateRandomNumber(0, all_two_handed_weapons.size() - 1);
+				int hand_selection = GenerateRandomNumber(0, 1);
+				switch (hand_selection)
+				{
+				case 0:
+					character->EquipToLeftHand(all_two_handed_weapons[selection]);
+					selectionMade = true;
+					break;
+				case 1:
+					character->EquipToRightHand(all_two_handed_weapons[selection]);
+					selectionMade = true;
+					break;
+				}
+			}
+		}
+		else if (selection == 1) // one-handed weapon and sheild
+		{
+			std::vector<ITEMS> all_one_handed_weapons;
+			const std::map<ITEMS, int> inventory = character->getInventory();
+
+			for (auto& item : inventory)
+			{
+				if (isOneHandedWeapon(item.first))
+					all_one_handed_weapons.push_back(item.first);
+			}
+
+			if (all_one_handed_weapons.size() > 0)
+			{
+				selection = GenerateRandomNumber(0, all_one_handed_weapons.size() - 1);
+				int hand_selection = GenerateRandomNumber(0, 1);
+				switch (hand_selection)
+				{
+				case 0:
+					character->EquipToLeftHand(all_one_handed_weapons[selection]);
+					if (character->HasItem(ITEMS::SHIELD))
+						character->EquipToRightHand(ITEMS::SHIELD);
+					selectionMade = true;
+					break;
+				case 1:
+					character->EquipToRightHand(all_one_handed_weapons[selection]);
+					if (character->HasItem(ITEMS::SHIELD))
+						character->EquipToLeftHand(ITEMS::SHIELD);
+					selectionMade = true;
+					break;
+				}
+			}
+		}
+		else if (selection == 2) // dual one-handed weapons
+		{
+			std::vector<ITEMS> all_one_handed_weapons;
+			const std::map<ITEMS, int> inventory = character->getInventory();
+
+			for (auto& item : inventory)
+			{
+				if (isOneHandedWeapon(item.first))
+					all_one_handed_weapons.push_back(item.first);
+			}
+
+			if (all_one_handed_weapons.size() == 1)
+			{
+				int hand_selection = GenerateRandomNumber(0, 1);
+				switch (hand_selection)
+				{
+				case 0:
+					character->EquipToLeftHand(all_one_handed_weapons[selection]);
+					selectionMade = true;
+					break;
+				case 1:
+					character->EquipToRightHand(all_one_handed_weapons[selection]);
+					selectionMade = true;
+					break;
+				}
+			}
+			else if (all_one_handed_weapons.size() > 2)
+			{
+				int select_1 = 0;
+				int select_2 = 0;
+
+				while (select_1 == select_2)
+				{
+					select_1 = GenerateRandomNumber(0, all_one_handed_weapons.size() - 1);
+					select_2 = GenerateRandomNumber(0, all_one_handed_weapons.size() - 1);
+
+					if (select_1 == select_2 && character->QuantityOfItem(all_one_handed_weapons[select_1]) > 1)
+					{
+						break;
+					}
+				}
+
+				int hand_selection = GenerateRandomNumber(0, 1);
+				switch (hand_selection)
+				{
+				case 0:
+					character->EquipToLeftHand(all_one_handed_weapons[select_1]);
+					character->EquipToRightHand(all_one_handed_weapons[select_2]);
+					selectionMade = true;
+					break;
+				case 1:
+					character->EquipToLeftHand(all_one_handed_weapons[select_2]);
+					character->EquipToRightHand(all_one_handed_weapons[select_1]);
+					selectionMade = true;
+					break;
+				}
+			}
+		}
+		else if (selection == 3) // dual sheilds
+		{
+			if (character->QuantityOfItem(ITEMS::SHIELD) > 1)
+			{
+				character->EquipToLeftHand(ITEMS::SHIELD);
+				character->EquipToRightHand(ITEMS::SHIELD);
+				selectionMade = true;
+			}
 		}
 	}
 }

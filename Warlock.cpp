@@ -26,6 +26,11 @@ void Warlock::SkillOptions(Character* character, int total_trained_allowed)
 
 }
 
+void Warlock::EquipItems(Character* character)
+{
+
+}
+
 const std::map<ABILITIES, int> Warlock::WARLOCK_ABILITY_LEVELS = {
 	{ABILITIES::SECOND_WIND, 3}
 };

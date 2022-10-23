@@ -26,6 +26,11 @@ void Fighter::SkillOptions(Character* character, int total_trained_allowed)
 
 }
 
+void Fighter::EquipItems(Character* character)
+{
+
+}
+
 const std::map<ABILITIES, int> Fighter::FIGHTER_ABILITY_LEVELS = {
 	{ABILITIES::SECOND_WIND, 3}
 };

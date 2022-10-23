@@ -26,6 +26,11 @@ void Druid::SkillOptions(Character* character, int total_trained_allowed)
 
 }
 
+void Druid::EquipItems(Character* character)
+{
+
+}
+
 const std::map<ABILITIES, int> Druid::DRUID_ABILITY_LEVELS = {
 	{ABILITIES::SECOND_WIND, 3}
 };

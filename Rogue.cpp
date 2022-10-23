@@ -69,6 +69,11 @@ void Rogue::SkillOptions(Character* character, int total_trained_allowed)
 
 }
 
+void Rogue::EquipItems(Character* character)
+{
+
+}
+
 const std::map<ABILITIES, int> Rogue::ROGUE_ABILITY_LEVELS = {
 	{ABILITIES::SECOND_WIND, 3}
 };

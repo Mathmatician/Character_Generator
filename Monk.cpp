@@ -26,6 +26,11 @@ void Monk::SkillOptions(Character* character, int total_trained_allowed)
 
 }
 
+void Monk::EquipItems(Character* character)
+{
+
+}
+
 const std::map<ABILITIES, int> Monk::MONK_ABILITY_LEVELS = {
 	{ABILITIES::SECOND_WIND, 3}
 };

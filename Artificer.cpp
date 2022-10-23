@@ -27,6 +27,11 @@ void Artificer::SkillOptions(Character* character, int total_trained_allowed)
 
 }
 
+void Artificer::EquipItems(Character* character)
+{
+
+}
+
 
 const std::map<ABILITIES, int> Artificer::ARTIFICER_ABILITY_LEVELS = {
 	{ABILITIES::SECOND_WIND, 3}

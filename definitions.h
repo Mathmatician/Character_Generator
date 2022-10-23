@@ -594,14 +594,137 @@ static std::string GetAlignmentText(ALIGNMENTS alignment_id)
 	return "";
 }
 
-static int GetArmorAC(ITEMS armr)
+static bool isTwoHandedWeapon(ITEMS weapon)
+{
+	switch (weapon)
+	{
+	case ITEMS::GREATCLUB:
+		return true;
+	case ITEMS::CROSSBOW_LIGHT:
+		return true;
+	case ITEMS::SHORTBOW:
+		return true;
+	case ITEMS::GLAIVE:
+		return true;
+	case ITEMS::GREATAXE:
+		return true;
+	case ITEMS::GREATSWORD:
+		return true;
+	case ITEMS::HALBERD:
+		return true;
+	case ITEMS::MAUL:
+		return true;
+	case ITEMS::PIKE:
+		return true;
+	case ITEMS::CROSSBOW_HEAVY:
+		return true;
+	case ITEMS::LONGBOW:
+		return true;
+	}
+
+	return false;
+}
+
+static bool isOneHandedWeapon(ITEMS weapon)
+{
+	return !isTwoHandedWeapon(weapon);
+}
+
+static int getArmorBaseValue(ITEMS armr)
 {
 	switch (armr)
 	{
-	case ITEMS::LEATHER_ARMOR:
-		return 1;
+	case ITEMS::LIGHT_ARMOR_PADDED:
+		return 11;
+		break;
+	case ITEMS::LIGHT_ARMOR_LEATHER:
+		return 11;
+		break;
+	case ITEMS::LIGHT_ARMOR_STUDDED_LEATHER:
+		return 12;
+		break;
+	case ITEMS::MEDIUM_ARMOR_HIDE:
+		return 12;
+		break;
+	case ITEMS::MEDIUM_ARMOR_CHAIN_SHIRT:
+		return 13;
+		break;
+	case ITEMS::MEDIUM_ARMOR_SCALE_MAIL:
+		return 14;
+		break;
+	case ITEMS::MEDIUM_ARMOR_BREASTPLATE:
+		return 14;
+		break;
+	case ITEMS::MEDIUM_ARMOR_HALFPLATE:
+		return 15;
+		break;
+	case ITEMS::HEAVY_ARMOR_RING_MAIL:
+		return 14;
+	case ITEMS::HEAVY_ARMOR_CHAIN_MAIL:
+		return 16;
+	case ITEMS::HEAVY_ARMOR_SPLINT:
+		return 17;
+		break;
+	case ITEMS::HEAVY_ARMOR_PLATE:
+		return 18;
 		break;
 	}
 
 	return -1;
+}
+
+static bool isLightArmor(ITEMS armr)
+{
+	switch (armr)
+	{
+	case ITEMS::LIGHT_ARMOR_PADDED:
+		return true;
+	case ITEMS::LIGHT_ARMOR_LEATHER:
+		return true;
+	case ITEMS::LIGHT_ARMOR_STUDDED_LEATHER:
+		return true;
+	}
+
+	return false;
+}
+
+static bool isMediumArmor(ITEMS armr)
+{
+	switch (armr)
+	{
+	case ITEMS::MEDIUM_ARMOR_HIDE:
+		return true;
+	case ITEMS::MEDIUM_ARMOR_CHAIN_SHIRT:
+		return true;
+	case ITEMS::MEDIUM_ARMOR_SCALE_MAIL:
+		return true;
+	case ITEMS::MEDIUM_ARMOR_BREASTPLATE:
+		return true;
+	case ITEMS::MEDIUM_ARMOR_HALFPLATE:
+		return true;
+	}
+
+	return false;
+}
+
+static bool isHeavyArmor(ITEMS armr)
+{
+	switch (armr)
+	{
+	case ITEMS::HEAVY_ARMOR_RING_MAIL:
+		return true;
+	case ITEMS::HEAVY_ARMOR_CHAIN_MAIL:
+		return true;
+	case ITEMS::HEAVY_ARMOR_SPLINT:
+		return true;
+	case ITEMS::HEAVY_ARMOR_PLATE:
+		return true;
+	}
+
+	return false;
+}
+
+static bool isArmor(ITEMS armr)
+{
+	return (isLightArmor(armr) || isMediumArmor(armr) || isHeavyArmor(armr));
 }

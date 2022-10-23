@@ -24,32 +24,32 @@ void CharacterCreationProcess(CLASSES class_id, RACES race_id, BACKGROUNDS backg
 	// Step 7 Select trained skills by class
 	SelectTrainedSkillsByClass(character);
 
-	// Step 7: Select languages by background
-	SelectLanguagesByBackground(character);
-
-	// Step 8: Add Equipment by background
-	AddEquipmentByBackground(character);
-
-	// Step 9: Roll for ability scores
+	// Step 8: Roll for ability scores
 	//    - roll 4 dice, drop the lowest, and add remaining 3
 	RollAbilityScores(character);
 
-	// Step 10: Add ability points by race
+	// Step 9: Add ability points by race
 	AddAbilityPointsByRace(character);
 
-	// Step 11: Add ability points by level
+	// Step 10: Add ability points by level
 	AddAbilityPointsByLevel(character);
 
-	// Step 12: Set Hitpoints
+	// Step 11: Select languages by background
+	SelectLanguagesByBackground(character);
+
+	// Step 12: Add Equipment by background
+	AddEquipmentByBackground(character);
+
+	// Step 13: Add Equipment By Class
+	AddEquipmentByClass(character);
+
+	// Step 14: Set Hitpoints
 	SetHitPoints(character);
 
-	// Step 13: Set armor class
-	SetArmorClass(character);
-
-	// Step 14: Set speed
+	// Step 15: Set speed
 	SetCharacterSpeed(character);
 
-	// Step 15: Set initiative
+	// Step 16: Set initiative
 	character->SetInitiative(character->getAbilityModifier(ABILITY_SCORES::DEXTERITY));
 
 	DisplayCharacterStats(character);
@@ -235,7 +235,7 @@ void AddAbilityPointsByLevel(Character* character)
 
 	while (ability_points > 0)
 	{
-		ABILITY_SCORES random_ability_score;
+		ABILITY_SCORES random_ability_score = ABILITY_SCORES::NOTHING;
 		switch (character->getClassId())
 		{
 		case CLASSES::ARTIFICER:
@@ -279,7 +279,7 @@ void AddAbilityPointsByLevel(Character* character)
 			break;
 		}
 
-		if (character->getAbilityScore((ABILITY_SCORES)random_ability_score) < 20)
+		if ((ABILITY_SCORES)random_ability_score != ABILITY_SCORES::NOTHING && character->getAbilityScore((ABILITY_SCORES)random_ability_score) < 20)
 		{
 			character->AddToAbilityScore((ABILITY_SCORES)random_ability_score, 1);
 			ability_points--;
@@ -441,18 +441,69 @@ void SelectTrainedSkillsByClass(Character* character)
 	}
 }
 
-void SetArmorClass(Character* character)
-{
-	int armor_class_value = GetArmorAC(character->getAttire());
-	character->SetArmorClass(armor_class_value);
-}
-
 void AddEquipmentByBackground(Character* character)
 {
 	switch (character->getBackground())
 	{
 	case BACKGROUNDS::ACOLYTE:
 		AcolyteEquipmentSelection(character);
+		break;
+	}
+}
+
+void AddEquipmentByClass(Character* character)
+{
+	switch (character->getClassId())
+	{
+	case CLASSES::ARTIFICER:
+		break;
+	case CLASSES::BARBARIAN:
+		Barbarian::EquipmentSelection(character);
+		Barbarian::EquipItems(character);
+		break;
+	case CLASSES::BARD:
+		Bard::EquipmentSelection(character);
+		Bard::EquipItems(character);
+		break;
+	case CLASSES::CLERIC:
+		Cleric::EquipmentSelection(character);
+		Cleric::EquipItems(character);
+		break;
+	case CLASSES::DRUID:
+		Druid::EquipmentSelection(character);
+		Druid::EquipItems(character);
+		break;
+	case CLASSES::FIGHTER:
+		Fighter::EquipmentSelection(character);
+		Fighter::EquipItems(character);
+		break;
+	case CLASSES::MONK:
+		Monk::EquipmentSelection(character);
+		Monk::EquipItems(character);
+		break;
+	case CLASSES::PALADIN:
+		Paladin::EquipmentSelection(character);
+		Paladin::EquipItems(character);
+		break;
+	case CLASSES::RANGER:
+		Ranger::EquipmentSelection(character);
+		Ranger::EquipItems(character);
+		break;
+	case CLASSES::ROGUE:
+		Rogue::EquipmentSelection(character);
+		Rogue::EquipItems(character);
+		break;
+	case CLASSES::SORCERER:
+		Sorcerer::EquipmentSelection(character);
+		Sorcerer::EquipItems(character);
+		break;
+	case CLASSES::WARLOCK:
+		Warlock::EquipmentSelection(character);
+		Warlock::EquipItems(character);
+		break;
+	case CLASSES::WIZARD:
+		Wizard::EquipmentSelection(character);
+		Wizard::EquipItems(character);
 		break;
 	}
 }

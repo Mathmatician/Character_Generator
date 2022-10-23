@@ -11,10 +11,10 @@ class Character {
 private:
 	std::string character_name;
 	int level = 1;
-	BACKGROUNDS background;
+	BACKGROUNDS background = BACKGROUNDS::NOTHING;
 	std::string player_name;
-	RACES race;
-	ALIGNMENTS alignment;
+	RACES race = RACES::NOTHING;
+	ALIGNMENTS alignment = ALIGNMENTS::NOTHING;
 	int experience_points;
 	int armor_class;
 	int initiative;
@@ -25,6 +25,8 @@ private:
 	float copper;
 
 	ITEMS current_attire = ITEMS::NOTHING;
+	ITEMS left_hand = ITEMS::NOTHING;
+	ITEMS right_hand = ITEMS::NOTHING;
 
 	struct HITDICE {
 		int total = 0;
@@ -76,6 +78,7 @@ public:
 	void AddToInventory(ITEMS itm, int quantity);
 	void RemoveFromInventory(ITEMS, int quantity);
 	bool HasItem(ITEMS itm);
+	int QuantityOfItem(ITEMS itm);
 	void SetMoneyAmount(int mny);
 	void AddMoney(int mny);
 	void SubtractMoney(int mny);
@@ -99,6 +102,10 @@ public:
 	void SetDeathSaves(int death_save_id);
 	void ResetDeathSaves();
 	void SetAttire(ITEMS attire_id);
+	void EquipToLeftHand(ITEMS itm);
+	void EquipToRightHand(ITEMS itm);
+	void RemoveFromLeftHand();
+	void RemoveFromRightHand();
 	void MarkSavingThrow(ABILITY_SCORES attr_id);
 	void UnmarkSavingThrow(ABILITY_SCORES attr_id);
 	bool AddLanguage(LANGUAGES language);

@@ -230,6 +230,11 @@ void Bard::InstrumentProficiencySelection(Character* character)
 	}
 }
 
+void Bard::EquipItems(Character* character)
+{
+
+}
+
 const std::map<ABILITIES, int> Bard::BARD_ABILITY_LEVELS = {
 	{ABILITIES::SECOND_WIND, 3}
 };

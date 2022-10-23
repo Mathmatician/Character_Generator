@@ -11,4 +11,5 @@ public:
 	static void EquipmentSelection(Character* character);
 	static void SkillOptions(Character* character, int total_trained_allowed);
 	static void InstrumentProficiencySelection(Character* character);
+	static void EquipItems(Character* character);
 };

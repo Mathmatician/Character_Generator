@@ -26,6 +26,11 @@ void Paladin::SkillOptions(Character* character, int total_trained_allowed)
 
 }
 
+void Paladin::EquipItems(Character* character)
+{
+
+}
+
 const std::map<ABILITIES, int> Paladin::PALADIN_ABILITY_LEVELS = {
 	{ABILITIES::SECOND_WIND, 3}
 };

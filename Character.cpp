@@ -111,6 +111,16 @@ bool Character::HasItem(ITEMS itm)
 	return false;
 }
 
+int Character::QuantityOfItem(ITEMS itm)
+{
+	if (HasItem(itm))
+	{
+		return inventory[itm];
+	}
+
+	return 0;
+}
+
 void Character::SetMoneyAmount(int mny)
 {
 	copper = mny;
@@ -137,7 +147,8 @@ bool Character::SetAbilityScore(ABILITY_SCORES attr_id, int value)
 
 void Character::AddToAbilityScore(ABILITY_SCORES attr_id, int value)
 {
-	ability_scores[(int)attr_id] += value;
+	if ((int)attr_id >= 0 && (int)attr_id < (int)ABILITY_SCORES::NUM_OF_ABILITY_SCORES)
+		ability_scores[(int)attr_id] += value;
 }
 
 void Character::MarkSkillTrained(SKILLS skill_id)
@@ -340,7 +351,84 @@ void Character::ResetDeathSaves()
 
 void Character::SetAttire(ITEMS attire_id)
 {
+	int dex = getAbilityModifier(ABILITY_SCORES::CONSTITUTION);
+	int armor_base_value = getArmorBaseValue(current_attire);
+
 	current_attire = attire_id;
+
+	if (armor_base_value != -1)
+	{
+		if (isMediumArmor(attire_id))
+		{
+			if (dex > 2)
+				SetArmorClass(12 + 2);
+			else
+				SetArmorClass(12 + dex);
+		}
+		else
+		{
+			SetArmorClass(armor_base_value + dex);
+		}
+	}
+	else
+	{
+		if (class_ID == CLASSES::BARBARIAN)
+		{
+			int cnst = getAbilityModifier(ABILITY_SCORES::CONSTITUTION);
+			SetArmorClass(10 + dex + cnst);
+		}
+		else if (class_ID == CLASSES::MONK)
+		{
+			int wsdm = getAbilityModifier(ABILITY_SCORES::WISDOM);
+			SetArmorClass(10 + dex + wsdm);
+		}
+	}
+}
+
+void Character::EquipToLeftHand(ITEMS itm)
+{
+	left_hand = itm;
+	if (left_hand == ITEMS::SHIELD)
+	{
+		int armr = getArmorClass() + 2;
+		SetArmorClass(armr);
+	}
+}
+
+void Character::EquipToRightHand(ITEMS itm)
+{
+	right_hand = itm;
+	if (right_hand == ITEMS::SHIELD)
+	{
+		int armr = getArmorClass() + 2;
+		SetArmorClass(armr);
+	}
+}
+
+void Character::RemoveFromLeftHand()
+{
+	if (left_hand == ITEMS::SHIELD)
+	{
+		int armr = getArmorClass() - 2;
+		SetArmorClass(armr);
+	}
+	left_hand = ITEMS::NOTHING;
+
+	if (getArmorClass() < 10)
+		SetArmorClass(10);
+}
+
+void Character::RemoveFromRightHand()
+{
+	if (left_hand == ITEMS::SHIELD)
+	{
+		int armr = getArmorClass() - 2;
+		SetArmorClass(armr);
+	}
+	right_hand = ITEMS::NOTHING;
+
+	if (getArmorClass() < 10)
+		SetArmorClass(10);
 }
 
 void Character::MarkSavingThrow(ABILITY_SCORES attr_id)

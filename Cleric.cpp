@@ -127,6 +127,11 @@ void Cleric::SkillOptions(Character* character, int total_trained_allowed)
 	}
 }
 
+void Cleric::EquipItems(Character* character)
+{
+
+}
+
 const std::map<ABILITIES, int> Cleric::CLERIC_ABILITY_LEVELS = {
 	{ABILITIES::SECOND_WIND, 3}
 };

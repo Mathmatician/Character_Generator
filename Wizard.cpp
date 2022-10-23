@@ -26,6 +26,11 @@ void Wizard::SkillOptions(Character* character, int total_trained_allowed)
 
 }
 
+void Wizard::EquipItems(Character* character)
+{
+
+}
+
 const std::map<ABILITIES, int> Wizard::WIZARD_ABILITY_LEVELS = {
 	{ABILITIES::SECOND_WIND, 3}
 };

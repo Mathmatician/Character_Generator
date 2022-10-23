@@ -10,4 +10,5 @@ public:
 	virtual int ABILITY_LEVEL(ABILITIES ability);
 	static void EquipmentSelection(Character* character);
 	static void SkillOptions(Character* character, int total_trained_allowed);
+	static void EquipItems(Character* character);
 };
