@@ -52,6 +52,8 @@ void CharacterCreationProcess(CLASSES class_id, RACES race_id, BACKGROUNDS backg
 	// Step 16: Set initiative
 	character->SetInitiative(character->getAbilityModifier(ABILITY_SCORES::DEXTERITY));
 
+	// Step 17: Set attack
+
 	DisplayCharacterStats(character);
 
 	delete character;

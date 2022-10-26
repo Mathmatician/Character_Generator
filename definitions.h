@@ -1,13 +1,14 @@
 #pragma once
 
 // Dice
-#define D4   0
-#define D6   1
-#define D8   2
-#define D10  3
-#define DP10 4
-#define D12  5
-#define D20  6
+#define NO_DICE	-1
+#define D4		 0
+#define D6		 1
+#define D8		 2
+#define D10		 3
+#define DP10	 4
+#define D12		 5
+#define D20		 6
 
 // Death Save definitions
 #define SUCCESS 0
@@ -23,6 +24,30 @@
 #define GOLD		100
 #define PLATINUM	1000
 
+
+// Weapon damage types
+#define BLUDGEONING 0
+#define PIERCING	1
+#define SLASHING	2
+
+// Pound definition
+#define POUND 100
+
+
+static enum class WEAPON_PROPERTIES {
+	NOTHING = -1,
+	LIGHT,
+	FINESSE,
+	THROWN,
+	TWO_HANDED,
+	VERSATILE,
+	AMMUNITION,
+	LOADING,
+	HEAVY,
+	REACH,
+	SPECIAL,
+	NUM_OF_PROPERTIES
+};
 
 // Character Classes
 static enum class CLASSES {
@@ -365,6 +390,72 @@ static enum class ITEMS {
 	NUM_OF_EQUIPMENT_ITEMS
 };
 
+// Weapon info struct object
+struct WEAPON_INFO {
+
+	struct DICE_INFO {
+		int dice = -1;
+		int num_of_dice = -1;
+	};
+
+	ITEMS weapon_id = ITEMS::NOTHING;
+	int cost = -1;
+	std::vector<DICE_INFO> dice_info;
+	int damage_type = -1;
+	int weight = -1;
+	std::vector<WEAPON_PROPERTIES> properties;
+
+	void AddDiceInfo(int dice, int num)
+	{
+		DICE_INFO obj;
+
+		if (dice < NO_DICE)
+			dice = NO_DICE;
+		else if (dice > D20)
+			dice = D20;
+
+		obj.dice = dice;
+
+		if (obj.dice == NO_DICE)
+			obj.num_of_dice = 0;
+		else
+			obj.num_of_dice = num;
+
+		dice_info.push_back(obj);
+	}
+
+	void RemoveDiceInfoAtIndex(int index)
+	{
+		if (index < dice_info.size() && index >= 0)
+			dice_info.erase(dice_info.begin() + index);
+	}
+
+	void AddProperty(WEAPON_PROPERTIES prop)
+	{
+		properties.push_back(prop);
+	}
+
+	void RemoveWeaponPropertyAtIndex(int index)
+	{
+		if (index < properties.size() && index >= 0)
+			properties.erase(properties.begin() + index);
+	}
+
+	bool hasProperty(WEAPON_PROPERTIES prop)
+	{
+		for (auto& p : properties)
+		{
+			if (p == prop)
+				return true;
+		}
+
+		return false;
+	}
+
+};
+
+static WEAPON_INFO getWeaponInfo(ITEMS weapon);
+
 static ABILITY_SCORES GetSKillType(SKILLS skill)
 {
 	switch (skill)
@@ -596,33 +687,8 @@ static std::string GetAlignmentText(ALIGNMENTS alignment_id)
 
 static bool isTwoHandedWeapon(ITEMS weapon)
 {
-	switch (weapon)
-	{
-	case ITEMS::GREATCLUB:
-		return true;
-	case ITEMS::CROSSBOW_LIGHT:
-		return true;
-	case ITEMS::SHORTBOW:
-		return true;
-	case ITEMS::GLAIVE:
-		return true;
-	case ITEMS::GREATAXE:
-		return true;
-	case ITEMS::GREATSWORD:
-		return true;
-	case ITEMS::HALBERD:
-		return true;
-	case ITEMS::MAUL:
-		return true;
-	case ITEMS::PIKE:
-		return true;
-	case ITEMS::CROSSBOW_HEAVY:
-		return true;
-	case ITEMS::LONGBOW:
-		return true;
-	}
-
-	return false;
+	WEAPON_INFO wpn = getWeaponInfo(weapon);
+	return wpn.hasProperty(WEAPON_PROPERTIES::TWO_HANDED);
 }
 
 static bool isOneHandedWeapon(ITEMS weapon)
@@ -727,4 +793,346 @@ static bool isHeavyArmor(ITEMS armr)
 static bool isArmor(ITEMS armr)
 {
 	return (isLightArmor(armr) || isMediumArmor(armr) || isHeavyArmor(armr));
+}
+
+static bool isWeapon(ITEMS weapon)
+{
+	WEAPON_INFO weapon_info = getWeaponInfo(weapon);
+
+	if (weapon_info.weapon_id == ITEMS::NOTHING)
+		return false;
+
+	return true;
+}
+
+static WEAPON_INFO getWeaponInfo(ITEMS weapon)
+{
+	WEAPON_INFO weapon_info;
+
+	switch (weapon)
+	{
+	case ITEMS::CLUB:
+		weapon_info.cost = 1 * SILVER;
+		weapon_info.AddDiceInfo(D4, 1);
+		weapon_info.damage_type = BLUDGEONING;
+		weapon_info.weight = 2 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::LIGHT);
+		break;
+
+	case ITEMS::DAGGER:
+		weapon_info.cost = 2 * GOLD;
+		weapon_info.AddDiceInfo(D4, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 1 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::FINESSE);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::LIGHT);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::THROWN);
+		break;
+
+	case ITEMS::GREATCLUB:
+		weapon_info.cost = 2 * SILVER;
+		weapon_info.AddDiceInfo(D8, 1);
+		weapon_info.damage_type = BLUDGEONING;
+		weapon_info.weight = 10 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::TWO_HANDED);
+		break;
+
+	case ITEMS::HANDAXE:
+		weapon_info.cost = 5 * GOLD;
+		weapon_info.AddDiceInfo(D6, 1);
+		weapon_info.damage_type = SLASHING;
+		weapon_info.weight = 2 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::LIGHT);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::THROWN);
+		break;
+
+	case ITEMS::JAVELIN:
+		weapon_info.cost = 5 * SILVER;
+		weapon_info.AddDiceInfo(D6, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 2 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::THROWN);
+		break;
+
+	case ITEMS::LIGHT_HAMMER:
+		weapon_info.cost = 2 * GOLD;
+		weapon_info.AddDiceInfo(D4, 1);
+		weapon_info.damage_type = BLUDGEONING;
+		weapon_info.weight = 2 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::LIGHT);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::THROWN);
+		break;
+
+	case ITEMS::MACE:
+		weapon_info.cost = 5 * GOLD;
+		weapon_info.AddDiceInfo(D6, 1);
+		weapon_info.damage_type = BLUDGEONING;
+		weapon_info.weight = 4 * POUND;
+		break;
+
+	case ITEMS::QUARTERSTAFF:
+		weapon_info.cost = 2 * SILVER;
+		weapon_info.AddDiceInfo(D6, 1);
+		weapon_info.damage_type = BLUDGEONING;
+		weapon_info.weight = 4 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::VERSATILE);
+		break;
+
+	case ITEMS::SICKLE:
+		weapon_info.cost = 1 * GOLD;
+		weapon_info.AddDiceInfo(D4, 1);
+		weapon_info.damage_type = SLASHING;
+		weapon_info.weight = 2 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::LIGHT);
+		break;
+
+	case ITEMS::SPEAR:
+		weapon_info.cost = 1 * GOLD;
+		weapon_info.AddDiceInfo(D6, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 3 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::THROWN);
+		break;
+
+	case ITEMS::CROSSBOW_LIGHT:
+		weapon_info.cost = 25 * GOLD;
+		weapon_info.AddDiceInfo(D8, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 5 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::AMMUNITION);
+		break;
+
+	case ITEMS::DART:
+		weapon_info.cost = 5 * COPPER;
+		weapon_info.AddDiceInfo(D4, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 0.25 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::FINESSE);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::THROWN);
+		break;
+
+	case ITEMS::SHORTBOW:
+		weapon_info.cost = 25 * GOLD;
+		weapon_info.AddDiceInfo(D6, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 2 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::AMMUNITION);
+		break;
+
+	case ITEMS::SLING:
+		weapon_info.cost = 1 * SILVER;
+		weapon_info.AddDiceInfo(D4, 1);
+		weapon_info.damage_type = BLUDGEONING;
+		weapon_info.weight = 0;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::AMMUNITION);
+		break;
+
+	case ITEMS::BATTLEAXE:
+		weapon_info.cost = 10 * GOLD;
+		weapon_info.AddDiceInfo(D8, 1);
+		weapon_info.damage_type = SLASHING;
+		weapon_info.weight = 4 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::VERSATILE);
+		break;
+
+	case ITEMS::FLAIL:
+		weapon_info.cost = 10 * GOLD;
+		weapon_info.AddDiceInfo(D8, 1);
+		weapon_info.damage_type = BLUDGEONING;
+		weapon_info.weight = 2 * POUND;
+		break;
+
+	case ITEMS::GLAIVE:
+		weapon_info.cost = 20 * GOLD;
+		weapon_info.AddDiceInfo(D10, 1);
+		weapon_info.damage_type = SLASHING;
+		weapon_info.weight = 6 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::HEAVY);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::REACH);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::TWO_HANDED);
+		break;
+
+	case ITEMS::GREATAXE:
+		weapon_info.cost = 30 * GOLD;
+		weapon_info.AddDiceInfo(D12, 1);
+		weapon_info.damage_type = SLASHING;
+		weapon_info.weight = 7 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::HEAVY);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::TWO_HANDED);
+		break;
+
+	case ITEMS::GREATSWORD:
+		weapon_info.cost = 50 * GOLD;
+		weapon_info.AddDiceInfo(D6, 2);
+		weapon_info.damage_type = SLASHING;
+		weapon_info.weight = 6 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::HEAVY);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::TWO_HANDED);
+		break;
+
+	case ITEMS::HALBERD:
+		weapon_info.cost = 20 * GOLD;
+		weapon_info.AddDiceInfo(D10, 1);
+		weapon_info.damage_type = SLASHING;
+		weapon_info.weight = 6 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::HEAVY);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::REACH);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::TWO_HANDED);
+		break;
+
+	case ITEMS::LANCE:
+		weapon_info.cost = 10 * GOLD;
+		weapon_info.AddDiceInfo(D12, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 6 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::REACH);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::SPECIAL);
+		break;
+
+	case ITEMS::LONGSWORD:
+		weapon_info.cost = 15 * GOLD;
+		weapon_info.AddDiceInfo(D8, 1);
+		weapon_info.damage_type = SLASHING;
+		weapon_info.weight = 3 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::VERSATILE);
+		break;
+
+	case ITEMS::MAUL:
+		weapon_info.cost = 10 * GOLD;
+		weapon_info.AddDiceInfo(D6, 2);
+		weapon_info.damage_type = BLUDGEONING;
+		weapon_info.weight = 10 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::HEAVY);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::TWO_HANDED);
+		break;
+
+	case ITEMS::MORNINGSTAR:
+		weapon_info.cost = 15 * GOLD;
+		weapon_info.AddDiceInfo(D8, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 4 * POUND;
+		break;
+
+	case ITEMS::PIKE:
+		weapon_info.cost = 5 * GOLD;
+		weapon_info.AddDiceInfo(D10, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 18 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::HEAVY);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::TWO_HANDED);
+		break;
+
+	case ITEMS::RAPIER:
+		weapon_info.cost = 25 * GOLD;
+		weapon_info.AddDiceInfo(D8, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 2 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::FINESSE);
+		break;
+
+	case ITEMS::SCIMITAR:
+		weapon_info.cost = 25 * GOLD;
+		weapon_info.AddDiceInfo(D6, 1);
+		weapon_info.damage_type = SLASHING;
+		weapon_info.weight = 3 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::FINESSE);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::LIGHT);
+		break;
+
+	case ITEMS::SHORTSWORD:
+		weapon_info.cost = 10 * GOLD;
+		weapon_info.AddDiceInfo(D6, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 2 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::FINESSE);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::LIGHT);
+		break;
+
+	case ITEMS::TRIDENT:
+		weapon_info.cost = 5 * GOLD;
+		weapon_info.AddDiceInfo(D6, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 4 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::THROWN);
+		break;
+
+	case ITEMS::WAR_PICK:
+		weapon_info.cost = 5 * GOLD;
+		weapon_info.AddDiceInfo(D8, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 2 * POUND;
+		break;
+
+	case ITEMS::WARHAMMER:
+		weapon_info.cost = 15 * GOLD;
+		weapon_info.AddDiceInfo(D8, 1);
+		weapon_info.damage_type = BLUDGEONING;
+		weapon_info.weight = 2 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::VERSATILE);
+		break;
+
+	case ITEMS::WHIP:
+		weapon_info.cost = 2 * GOLD;
+		weapon_info.AddDiceInfo(D4, 1);
+		weapon_info.damage_type = SLASHING;
+		weapon_info.weight = 3 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::FINESSE);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::REACH);
+		break;
+
+	case ITEMS::BLOWGUN:
+		weapon_info.cost = 10 * GOLD;
+		weapon_info.AddDiceInfo(NO_DICE, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 1 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::AMMUNITION);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::LOADING);
+		break;
+
+	case ITEMS::CROSSBOW_HAND:
+		weapon_info.cost = 75 * GOLD;
+		weapon_info.AddDiceInfo(D6, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 3 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::AMMUNITION);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::LIGHT);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::LOADING);
+		break;
+
+	case ITEMS::CROSSBOW_HEAVY:
+		weapon_info.cost = 50 * GOLD;
+		weapon_info.AddDiceInfo(D10, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 18 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::AMMUNITION);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::HEAVY);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::LOADING);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::TWO_HANDED);
+		break;
+
+	case ITEMS::LONGBOW:
+		weapon_info.cost = 50 * GOLD;
+		weapon_info.AddDiceInfo(D8, 1);
+		weapon_info.damage_type = PIERCING;
+		weapon_info.weight = 2 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::AMMUNITION);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::HEAVY);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::TWO_HANDED);
+		break;
+
+	case ITEMS::NET:
+		weapon_info.cost = 1 * GOLD;
+		weapon_info.weight = 3 * POUND;
+		weapon_info.AddProperty(WEAPON_PROPERTIES::SPECIAL);
+		weapon_info.AddProperty(WEAPON_PROPERTIES::THROWN);
+		break;
+
+	default: // Unarmed strike
+		weapon_info.damage_type = BLUDGEONING;
+		return weapon_info;
+	}
+
+	weapon_info.weapon_id = weapon;
+
+	return weapon_info;
 }

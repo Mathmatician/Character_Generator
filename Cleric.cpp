@@ -19,8 +19,6 @@ Cleric::Cleric(RACES race_id, BACKGROUNDS background_id)
 
 	MarkSavingThrow(ABILITY_SCORES::WISDOM);
 	MarkSavingThrow(ABILITY_SCORES::CHARISMA);
-
-	Cleric::EquipmentSelection(this);
 }
 
 int Cleric::ABILITY_LEVEL(ABILITIES ability)
