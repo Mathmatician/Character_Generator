@@ -15,6 +15,7 @@ private:
 	std::string player_name;
 	RACES race = RACES::NOTHING;
 	ALIGNMENTS alignment = ALIGNMENTS::NOTHING;
+	bool takeFeatAtStart = false; // for HUMAN ONLY
 	int experience_points;
 	int armor_class;
 	int initiative;
@@ -60,6 +61,7 @@ private:
 protected:
 	CLASSES class_ID;
 	const std::map<ABILITIES, int>* abilities_map;
+	void FeatOrIncreaseSkills();
 
 public:
 	void SetCharacterName(std::string nm);

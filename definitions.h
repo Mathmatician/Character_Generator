@@ -1,4 +1,5 @@
 #pragma once
+#include <sstream>
 
 // Dice
 #define NO_DICE	-1
@@ -82,6 +83,51 @@ static enum class RACES {
 	HALF_ORC,
 	TIEFLING,
 	NUM_OF_RACES
+};
+
+// Dwarf traits
+static enum class DWARF_TRAITS {
+	NUM_OF_TRAITS
+};
+
+// Elf traits
+static enum class ELF_TRAITS {
+	NUM_OF_TRAITS
+};
+
+// Halfling traits
+static enum class HALFLING_TRAITS {
+	NUM_OF_TRAITS
+};
+
+// Human traits
+static enum class HUMAN_TRAITS {
+	NUM_OF_TRAITS
+};
+
+// Dragonborn traits
+static enum class DRAGONBORN_TRAITS {
+	NUM_OF_TRAITS
+};
+
+// Gnome traits
+static enum class GNOME_TRAITS {
+	NUM_OF_TRAITS
+};
+
+// Half Elf traits
+static enum class HALF_ELF_TRAITS {
+	NUM_OF_TRAITS
+};
+
+// Half Orc traits
+static enum class HALF_ORC_TRAITS {
+	NUM_OF_TRAITS
+};
+
+// Tiefling traits
+static enum class TIEFLING_TRAITS {
+	NUM_OF_TRAITS
 };
 
 // Languages
@@ -390,6 +436,8 @@ static enum class ITEMS {
 	NUM_OF_EQUIPMENT_ITEMS
 };
 
+static std::string getDiceText(int dice);
+
 // Weapon info struct object
 struct WEAPON_INFO {
 
@@ -422,6 +470,30 @@ struct WEAPON_INFO {
 			obj.num_of_dice = num;
 
 		dice_info.push_back(obj);
+	}
+
+	std::string getDiceStringInfo()
+	{
+		std::string res = "";
+		for (auto& d : dice_info)
+		{
+			if (d.dice != -1 && d.num_of_dice > 0)
+			{
+				std::string num = "";
+				std::stringstream s;
+				s << d.num_of_dice;
+				s >> num;
+				res += num + "-" + getDiceText(d.dice) + ", ";
+			}
+		}
+
+		while (res[res.length() - 1] == ' ')
+			res.erase(res.end() - 1);
+
+		if (res[res.length() - 1] == ',')
+			res.erase(res.end() - 1);
+
+		return res;
 	}
 
 	void RemoveDiceInfoAtIndex(int index)
@@ -499,6 +571,29 @@ static ABILITY_SCORES GetSKillType(SKILLS skill)
 	}
 
 	return ABILITY_SCORES::NOTHING;
+}
+
+static std::string getDiceText(int dice)
+{
+	switch (dice)
+	{
+	case D4:
+		return "D4";
+	case D6:
+		return "D6";
+	case D8:
+		return "D8";
+	case D10:
+		return "D10";
+	case DP10:
+		return "DP 10";
+	case D12:
+		return "D12";
+	case D20:
+		return "D20";
+	}
+
+	return "";
 }
 
 static std::string GetSKillTypeText(SKILLS skill)
@@ -1135,4 +1230,216 @@ static WEAPON_INFO getWeaponInfo(ITEMS weapon)
 	weapon_info.weapon_id = weapon;
 
 	return weapon_info;
+}
+
+static std::string getWeaponString(ITEMS weapon)
+{
+	switch (weapon)
+	{
+	case ITEMS::CLUB:
+		return "Club";
+
+	case ITEMS::DAGGER:
+		return "Dagger";
+
+	case ITEMS::GREATCLUB:
+		return "Greatclub";
+
+	case ITEMS::HANDAXE:
+		return "Handaxe";
+
+	case ITEMS::JAVELIN:
+		return "Javelin";
+
+	case ITEMS::LIGHT_HAMMER:
+		return "Light Hammer";
+
+	case ITEMS::MACE:
+		return "Mace";
+
+	case ITEMS::QUARTERSTAFF:
+		return "Quarterstaff";
+
+	case ITEMS::SICKLE:
+		return "Sickle";
+
+	case ITEMS::SPEAR:
+		return "Spear";
+
+	case ITEMS::CROSSBOW_LIGHT:
+		return "Crossbow Light";
+
+	case ITEMS::DART:
+		return "Dart";
+
+	case ITEMS::SHORTBOW:
+		return "Shortbow";
+
+	case ITEMS::SLING:
+		return "Sling";
+
+	case ITEMS::BATTLEAXE:
+		return "Battleaxe";
+
+	case ITEMS::FLAIL:
+		return "Flail";
+
+	case ITEMS::GLAIVE:
+		return "Glaive";
+
+	case ITEMS::GREATAXE:
+		return "Greataxe";
+
+	case ITEMS::GREATSWORD:
+		return "Greatsword";
+
+	case ITEMS::HALBERD:
+		return "Halbred";
+
+	case ITEMS::LANCE:
+		return "Lance";
+
+	case ITEMS::LONGSWORD:
+		return "Longsword";
+
+	case ITEMS::MAUL:
+		return "Maul";
+
+	case ITEMS::MORNINGSTAR:
+		return "Morningstar";
+
+	case ITEMS::PIKE:
+		return "Pike";
+
+	case ITEMS::RAPIER:
+		return "Rapier";
+
+	case ITEMS::SCIMITAR:
+		return "Scimitar";
+
+	case ITEMS::SHORTSWORD:
+		return "Shortsword";
+
+	case ITEMS::TRIDENT:
+		return "Trident";
+
+	case ITEMS::WAR_PICK:
+		return "War Pick";
+
+	case ITEMS::WARHAMMER:
+		return "Warhammer";
+
+	case ITEMS::WHIP:
+		return "Whip";
+
+	case ITEMS::BLOWGUN:
+		return "Blowgun";
+
+	case ITEMS::CROSSBOW_HAND:
+		return "Crossbow Hand";
+
+	case ITEMS::CROSSBOW_HEAVY:
+		return "Crossbow Heavy";
+
+	case ITEMS::LONGBOW:
+		return "Longbow";
+
+	case ITEMS::NET:
+		return "Net";
+
+	default: // Unarmed strike
+		return "Unarmed Strike";
+	}
+
+	return "";
+}
+
+static std::string getDwarfTraitText(DWARF_TRAITS trait)
+{
+	switch (trait)
+	{
+
+	}
+
+	return "";
+}
+
+static std::string getElfTraitText(ELF_TRAITS trait)
+{
+	switch (trait)
+	{
+
+	}
+
+	return "";
+}
+
+static std::string getHalflingTraitText(HALFLING_TRAITS trait)
+{
+	switch (trait)
+	{
+
+	}
+
+	return "";
+}
+
+static std::string getHumanTraitText(HUMAN_TRAITS trait)
+{
+	switch (trait)
+	{
+
+	}
+
+	return "";
+}
+
+static std::string getDragonbornTraitText(DRAGONBORN_TRAITS trait)
+{
+	switch (trait)
+	{
+
+	}
+
+	return "";
+}
+
+static std::string getGnomeTraitText(GNOME_TRAITS trait)
+{
+	switch (trait)
+	{
+
+	}
+
+	return "";
+}
+
+static std::string getHalfElfTraitText(HALF_ELF_TRAITS trait)
+{
+	switch (trait)
+	{
+
+	}
+
+	return "";
+}
+
+static std::string getHalfOrcTraitText(HALF_ORC_TRAITS trait)
+{
+	switch (trait)
+	{
+
+	}
+
+	return "";
+}
+
+static std::string getTieflingTraitText(TIEFLING_TRAITS trait)
+{
+	switch (trait)
+	{
+
+	}
+
+	return "";
 }

@@ -4,6 +4,7 @@ Barbarian::Barbarian(RACES race_id, BACKGROUNDS background_id)
 {
 	class_ID = CLASSES::BARBARIAN;
 	SelectRace(race_id);
+	FeatOrIncreaseSkills();
 	SetBackground(background_id);
 	AddLanguage(LANGUAGES::COMMON_LANGUAGE);
 	abilities_map = &BARBARIAN_ABILITY_LEVELS;
@@ -208,6 +209,10 @@ void Barbarian::EquipItems(Character* character)
 		{
 			selection = GenerateRandomNumber(0, all_armor.size() - 1);
 			character->SetAttire(all_armor[selection]);
+		}
+		else
+		{
+			character->SetAttire(ITEMS::NOTHING);
 		}
 	}
 	else

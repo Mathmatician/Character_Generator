@@ -6,8 +6,7 @@ void CharacterCreationProcess(CLASSES class_id, RACES race_id, BACKGROUNDS backg
 	Character* character = SelectClass(class_id, race_id, background_id);
 
 	// Step 2: Set level
-	if (character->getLevel() > 1)
-		character->SetLevel(level);
+	character->SetLevel(1);
 
 	// Step 3: Set character name
 	character->SetPlayerName(player_name);
@@ -31,9 +30,6 @@ void CharacterCreationProcess(CLASSES class_id, RACES race_id, BACKGROUNDS backg
 	// Step 9: Add ability points by race
 	AddAbilityPointsByRace(character);
 
-	// Step 10: Add ability points by level
-	AddAbilityPointsByLevel(character);
-
 	// Step 11: Select languages by background
 	SelectLanguagesByBackground(character);
 
@@ -43,20 +39,41 @@ void CharacterCreationProcess(CLASSES class_id, RACES race_id, BACKGROUNDS backg
 	// Step 13: Add Equipment By Class
 	AddEquipmentByClass(character);
 
-	// Step 14: Set Hitpoints
-	SetHitPoints(character);
-
-	// Step 15: Set speed
+	// Step 14: Set speed
 	SetCharacterSpeed(character);
 
-	// Step 16: Set initiative
+	// Step 15: Set initiative
 	character->SetInitiative(character->getAbilityModifier(ABILITY_SCORES::DEXTERITY));
 
-	// Step 17: Set attack
+	// Step 16: Level Up
+	for (int i = 0; i < level; i++)
+		LevelUp(character);
 
 	DisplayCharacterStats(character);
 
 	delete character;
+}
+
+void LevelUp(Character* character)
+{
+	int next_level = character->getLevel() + 1;
+	character->SetLevel(next_level);
+
+	if ((next_level % 4 == 0 || next_level == 19) && next_level != 20)
+	{
+		int selection = GenerateRandomNumber(0, 1);
+		switch (selection)
+		{
+		case 0:
+			AddAbilityPoints(character, 2);
+			break;
+		case 1:
+			AddFeat(character);
+			break;
+		}
+	}
+
+	SetHitPoints(character);
 }
 
 Character* SelectClass(CLASSES class_id, RACES race_id, BACKGROUNDS background_id)
@@ -224,18 +241,9 @@ void RollForGold(Character* character)
 	}
 }
 
-void AddAbilityPointsByLevel(Character* character)
+void AddAbilityPoints(Character* character, int points)
 {
-	int ability_points = character->getLevel() / 4;
-
-	if (character->getLevel() == 19)
-		ability_points++;
-
-	int feats_to_add = GenerateRandomNumber(0, ability_points);
-
-	ability_points -= feats_to_add;
-
-	while (ability_points > 0)
+	while (points > 0)
 	{
 		ABILITY_SCORES random_ability_score = ABILITY_SCORES::NOTHING;
 		switch (character->getClassId())
@@ -284,13 +292,8 @@ void AddAbilityPointsByLevel(Character* character)
 		if ((ABILITY_SCORES)random_ability_score != ABILITY_SCORES::NOTHING && character->getAbilityScore((ABILITY_SCORES)random_ability_score) < 20)
 		{
 			character->AddToAbilityScore((ABILITY_SCORES)random_ability_score, 1);
-			ability_points--;
+			points--;
 		}
-	}
-
-	for (int i = 0; i < feats_to_add; i++)
-	{
-		AddFeat(character);
 	}
 }
 
@@ -372,17 +375,22 @@ void SetCharacterSpeed(Character* character)
 		character->SetSpeed(25);
 		break;
 	case RACES::HUMAN:
+		character->SetSpeed(30);
 		break;
 	case RACES::DRAGONBORN:
+		character->SetSpeed(30);
 		break;
 	case RACES::GNOME:
+		character->SetSpeed(25);
 		break;
 	case RACES::HALF_ELF:
+		character->SetSpeed(30);
 		break;
 	case RACES::HALF_ORC:
 		character->SetSpeed(30);
 		break;
 	case RACES::TIEFLING:
+		character->SetSpeed(30);
 		break;
 	}
 }
@@ -620,29 +628,48 @@ ABILITY_SCORES SelectRandomAbilityScoreWithWeight(ABILITY_SCORE_PREFERENCE* absp
 
 void SetHitPoints(Character* character)
 {
-	int hp = character->getMaxHitpoints() + character->getAbilityModifier(ABILITY_SCORES::CONSTITUTION);
+	int dice_res = RollDice(character->getHitDiceType());
+
+	if (dice_res == 0)
+		dice_res = 10;
+
+	int hp = dice_res + character->getAbilityModifier(ABILITY_SCORES::CONSTITUTION) + character->getMaxHitpoints();
 	character->SetMaxHitpoints(hp);
 	character->SetCurrentHitpoints(hp);
+}
 
-	int count = character->getLevel() - 1;
-	while (count > 0)
+void DisplayWeaponsStats(Character* character)
+{
+	std::vector<ITEMS> all_weapons;
+	std::map<ITEMS, int> inventory = character->getInventory();
+
+	for (auto& item : inventory)
 	{
-		int total_dice_roll = 0;
-		for (int i = 0; i < character->getHitDiceTotal(); i++)
+		if (isWeapon(item.first))
+			all_weapons.push_back(item.first);
+	}
+
+	for (auto& item : all_weapons)
+	{
+		WEAPON_INFO weapon = getWeaponInfo(item);
+		int fin_atk_bonus = character->getAbilityModifier(ABILITY_SCORES::DEXTERITY);
+		int str_atk_bonus = character->getAbilityModifier(ABILITY_SCORES::STRENGTH);
+		int selected_atk_bonus;
+
+		if (weapon.hasProperty(WEAPON_PROPERTIES::FINESSE) && fin_atk_bonus > str_atk_bonus)
 		{
-			int dice_res = RollDice(character->getHitDiceType());
-
-			if (dice_res == 0) 
-				dice_res = 10;
-
-			total_dice_roll += dice_res;
+			selected_atk_bonus = fin_atk_bonus;
+			if (character->isProficientWithSavingThrow(ABILITY_SCORES::DEXTERITY))
+				selected_atk_bonus += character->getProficiencyBonus();
+		}
+		else
+		{
+			selected_atk_bonus = str_atk_bonus;
+			if (character->isProficientWithSavingThrow(ABILITY_SCORES::STRENGTH))
+				selected_atk_bonus += character->getProficiencyBonus();
 		}
 
-		hp = total_dice_roll + character->getAbilityModifier(ABILITY_SCORES::CONSTITUTION) + character->getMaxHitpoints();
-		character->SetMaxHitpoints(hp);
-		character->SetCurrentHitpoints(hp);
-
-		count--;
+		std::cout << getWeaponString(item) << "\t" << selected_atk_bonus << "\t" << weapon.getDiceStringInfo() << std::endl;
 	}
 }
 
@@ -693,6 +720,39 @@ void DisplayCharacterStats(Character* character)
 
 		std::cout << GetSkillText((SKILLS)i) << "(" << (int)GetSKillType((SKILLS)i) << "):" << num_of_tabs << character->getSkillValue((SKILLS)i) << std::endl;
 	}
+
+	std::cout << std::endl << std::endl << std::endl;
+
+	std::cout << "--------------------------------------" << std::endl;
+	std::cout << "| Armor Class, Initiative, and Speed |" << std::endl;
+	std::cout << "--------------------------------------" << std::endl;
+	std::cout << "Armor Class:\t" << character->getArmorClass() << std::endl;
+	std::cout << "Initiative:\t" << character->getInitiative() << std::endl;
+	std::cout << "Speed:\t" << character->getSpeed() << std::endl;
+
+	std::cout << std::endl << std::endl << std::endl;
+
+	std::cout << "--------------" << std::endl;
+	std::cout << "| Hit Points |" << std::endl;
+	std::cout << "--------------" << std::endl;
+	std::cout << "Hit Point Maximum:\t" << character->getMaxHitpoints() << std::endl;
+	std::cout << "Current Hit Points:\t" << character->getCurrentHitpoints() << std::endl;
+	std::cout << "Temporary Hit Points:\t" << character->getTemporaryHitpoints() << std::endl;
+
+	std::cout << std::endl << std::endl << std::endl;
+
+	std::cout << "------------" << std::endl;
+	std::cout << "| Hit Dice |" << std::endl;
+	std::cout << "------------" << std::endl;
+	std::cout << "Hit dice:\t" << character->getHitDiceType() << std::endl;
+	std::cout << "Total:\t\t" << character->getHitDiceTotal() << std::endl;
+
+	std::cout << std::endl << std::endl << std::endl;
+
+	std::cout << "---------------------------" << std::endl;
+	std::cout << "| Attack and Spellcasting |" << std::endl;
+	std::cout << "---------------------------" << std::endl;
+	DisplayWeaponsStats(character);
 
 	std::cout << std::endl << std::endl << std::endl;
 

@@ -9,6 +9,7 @@ void Character::SetCharacterName(std::string nm)
 void Character::SetLevel(int lvl)
 {
 	level = lvl;
+	SetHitDice(getHitDiceType(), level);
 
 	int i = 0;
 	while (i < ability_list.size())
@@ -382,6 +383,10 @@ void Character::SetAttire(ITEMS attire_id)
 			int wsdm = getAbilityModifier(ABILITY_SCORES::WISDOM);
 			SetArmorClass(10 + dex + wsdm);
 		}
+		else
+		{
+			SetArmorClass(10);
+		}
 	}
 }
 
@@ -636,6 +641,9 @@ const int Character::getSkillValue(SKILLS skill_id)
 {
 	int mod_val = getAbilityModifier(GetSKillType(skill_id));
 
+	if (getRaceId() == RACES::HUMAN && !takeFeatAtStart)
+		mod_val++;
+
 	if (isProficientInSkill(skill_id))
 		return (mod_val + getProficiencyBonus());
 
@@ -766,4 +774,18 @@ bool Character::isDwarf(Character* character)
 		return true;
 
 	return false;
+}
+
+void Character::FeatOrIncreaseSkills()
+{
+	if (getRaceId() == RACES::HUMAN)
+	{
+		takeFeatAtStart = GenerateRandomNumber(0, 1);
+
+		if (takeFeatAtStart)
+		{
+			FEATS selection = (FEATS)GenerateRandomNumber(0, (int)FEATS::NUM_OF_FEATS);
+			AddFeat(selection);
+		}
+	}
 }
