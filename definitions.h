@@ -7,7 +7,7 @@
 #define D6		 1
 #define D8		 2
 #define D10		 3
-#define DP10	 4
+#define D100	 	 4
 #define D12		 5
 #define D20		 6
 
