@@ -1,5 +1,5 @@
 #pragma once
-#include <random>>
+#include <random>
 
 static int GenerateRandomNumber(int min, int max)
 {
